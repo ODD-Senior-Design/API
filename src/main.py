@@ -1,36 +1,40 @@
-import os
+from os import getenv
+from typing import Optional, Tuple, Any
 from flask import Flask, Response, request, jsonify, abort
 from uuid import UUID
-from db_handler import DBhandler as db
+from db_handler import DBhandler
 
-app: Flask = Flask('API')
+app: Flask = Flask( getenv( "APP_NAME" ) or 'API' )
+db = DBhandler( getenv( "DB_URI" ) or '' )
+debug_mode: bool = getenv( "DEBUG_MODE" ) == '1'
 
-@app.route('/panoramas/<uuid:id>', methods=['GET'])
-def get_panorama_uri_from_uuid( id: UUID ) -> Response:
-    panorama_uri: str = db.get_file_uri_from_uuid( id, 'panorama')
+@app.route( '/images/<uuid:id>', methods=['GET'] )
+def get_image_uri_from_uuid( id: UUID ) -> Response:
+    image_uri: Optional[Tuple[str]] = db.get_file_uri_from_uuid( id, 'images' )
 
-    if panorama_uri is None:
+    if image_uri is None:
         abort( 404 )
 
-    return jsonify( { "panorama": panorama_uri } )
+    return jsonify( image_uri )
 
-@app.route('/panoramas', methods=['POST'])
-def create_panorama() -> Response:
-    data: dict = request.get_json()
+@app.route( '/images', methods=['POST'] )
+def take_image() -> Response:
+    image_data: dict = request.get_json()
 
-    panorama_id: UUID = db.insert_panorama( data )
+    image_id: Optional[str] = db.create_entry( data=image_data, table_name='images' )
 
-    if panorama_id is None:
+    if image_id is None:
         abort( 500 )
 
-    return jsonify( { "panorama_id": panorama_id } )
+    return jsonify( { "image_id": image_id } )
 
 @app.errorhandler( 404 )
 def not_found( error ): return jsonify( error='Object Not Found' ), 404
 
 @app.errorhandler( 500 )
-def internal_server_error( error ): return jsonify( error='Server Error' ), 500
+def internal_server_error( error ): return jsonify( error='Database/Server Error' ), 500
 
 if __name__ == '__main__':
     print( 'Starting API...' )
-    app.run( debug=os.getenv( "DEBUG_MODE" ) == '1' )
+    app.run( debug=debug_mode )
+    
