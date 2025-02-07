@@ -1,12 +1,13 @@
 from os import getenv
-from typing import Optional, Tuple, Any
 from flask import Flask, Response, request, jsonify, abort
 from uuid import UUID
 from db_handler import DBhandler
+from webhook_handler import CameraInterface
 
 app: Flask = Flask( getenv( "APP_NAME" ) or 'API' )
-db = DBhandler( getenv( "DB_URI" ) or '' )
 debug_mode: bool = getenv( "DEBUG_MODE" ) == '1'
+db = DBhandler( getenv( "DB_URI" ) or '' )
+ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 
 @app.route( '/images/<uuid:id>', methods=['GET'] )
 def get_image_uri_from_uuid( id: UUID ) -> Response:
@@ -31,7 +32,14 @@ def take_image() -> Response:
 
     # TODO: Payload validation
 
-    image_id: Optional[str] = db.create_entry( data=image_data, table_name='images' )
+    resp = ci.capture_image( payload=image_data )
+
+    if resp is None:
+        abort( 500, 'Failed to capture image' )
+
+    image_data['uri'] = resp.get( 'uri' )
+
+    image_id = db.create_entry( data=image_data, table_name='images' )
 
     if image_id is None:
         abort( 500, 'No id recieved for new image' )
