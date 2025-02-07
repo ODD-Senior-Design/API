@@ -14,19 +14,43 @@ class DBhandler():
         self.__tables = [
 
             sa.Table (
-                'images', self.__metadata,
+
+                'patients', self.__metadata,
                 sa.Column( 'id', sa.UUID, primary_key=True ),
-                sa.Column( 'set_id', sa.String ),
-                sa.Column( 'patient_first', sa.String ),
-                sa.Column( 'patient_last', sa.String ),
-                sa.Column( 'uri', sa.String, unique=True )
+                sa.Column( 'first_name', sa.String, nullable=False ),
+                sa.Column( 'last_name', sa.String, nullable=False )
+
             ),
 
             sa.Table (
+
                 'image_sets', self.__metadata,
                 sa.Column( 'id', sa.UUID, primary_key=True ),
-                sa.Column( 'patient_first', sa.String ),
-                sa.Column( 'patient_last', sa.String )
+                sa.Column( 'patient_id', sa.UUID, sa.ForeignKey( 'patients.id' ) )
+
+            ),
+
+            sa.Table (
+
+                'images', self.__metadata,
+                sa.Column( 'id', sa.UUID, primary_key=True ),
+                sa.Column( 'set_id', sa.UUID, sa.ForeignKey( 'image_sets.id' ) ),
+                sa.Column( 'patient_id', sa.UUID, sa.ForeignKey( 'patients.id' ) ),
+                sa.Column( 'image_timestamp', sa.String, nullable=False),
+                sa.Column( 'uri', sa.String, unique=True, nullable=False )
+
+            ),
+
+            sa.Table (
+
+                'assessments', self.__metadata,
+                sa.Column( 'id', sa.UUID, primary_key=True ),
+                sa.Column( 'image_id', sa.UUID, sa.ForeignKey( 'images.id' ) ),
+                sa.Column( 'set_id', sa.UUID, sa.ForeignKey( 'image_sets.id' ) ),
+                sa.Column( 'patient_id', sa.UUID, sa.ForeignKey( 'patients.id' ) ),
+                sa.Column( 'assessment_timestamp', sa.String, nullable=False ),
+                sa.Column( 'assessment', sa.Integer, nullable=False )
+
             )
 
         ]

@@ -1,4 +1,13 @@
 {
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.typeCheckingMode": "standard"
+    "python.analysis.typeCheckingMode": "standard",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "./test.db",
+            "name": "Test DB"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }
