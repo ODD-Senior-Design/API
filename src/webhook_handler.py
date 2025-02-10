@@ -1,5 +1,6 @@
 import requests as req
 from typing import Optional, Dict
+
 class CameraInterface():
 
     def __init__( self, url: str, timeout: int = 10, debug: bool = False ):

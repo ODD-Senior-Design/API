@@ -44,7 +44,7 @@ def take_image() -> Response:
     if image_id is None:
         abort( 500, 'No id recieved for new image' )
 
-    return jsonify( { "image_id": image_id } )
+    return jsonify( { "id": image_id } )
 
 @app.errorhandler( 404 )
 def not_found( error_context ): return jsonify( { 'message': f'Object Not Found, Additional Info: { error_context.description }' } ), 404

@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from uuid import UUID
 from typing import Optional, List, Dict, Any
+from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
 
 class DBhandler():
 
@@ -48,8 +49,8 @@ class DBhandler():
                 sa.Column( 'image_id', sa.UUID, sa.ForeignKey( 'images.id' ) ),
                 sa.Column( 'set_id', sa.UUID, sa.ForeignKey( 'image_sets.id' ) ),
                 sa.Column( 'patient_id', sa.UUID, sa.ForeignKey( 'patients.id' ) ),
-                sa.Column( 'assessment_timestamp', sa.String, nullable=False ),
-                sa.Column( 'assessment', sa.Integer, nullable=False )
+                sa.Column( 'assessment_timestamp', sa.DateTime, nullable=False ),
+                sa.Column( 'assessment', sa.Boolean, nullable=False )
 
             )
 
