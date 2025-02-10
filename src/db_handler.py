@@ -5,62 +5,25 @@ from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
 
 class DBhandler():
 
-    def __init__( self, db_uri: str ):
+    def __init__( self, db_uri: str, debug: bool ):
 
-        self.__engine: sa.Engine = sa.create_engine( db_uri )
-        self.__metadata = sa.MetaData()
-        self.__init_tables()
-
-    def __init_tables( self ):
-        self.__tables = [
-
-            sa.Table (
-
-                'patients', self.__metadata,
-                sa.Column( 'id', sa.UUID, primary_key=True ),
-                sa.Column( 'first_name', sa.String, nullable=False ),
-                sa.Column( 'last_name', sa.String, nullable=False )
-
-            ),
-
-            sa.Table (
-
-                'image_sets', self.__metadata,
-                sa.Column( 'id', sa.UUID, primary_key=True ),
-                sa.Column( 'patient_id', sa.UUID, sa.ForeignKey( 'patients.id' ) )
-
-            ),
-
-            sa.Table (
-
-                'images', self.__metadata,
-                sa.Column( 'id', sa.UUID, primary_key=True ),
-                sa.Column( 'set_id', sa.UUID, sa.ForeignKey( 'image_sets.id' ) ),
-                sa.Column( 'patient_id', sa.UUID, sa.ForeignKey( 'patients.id' ) ),
-                sa.Column( 'image_timestamp', sa.String, nullable=False),
-                sa.Column( 'uri', sa.String, unique=True, nullable=False )
-
-            ),
-
-            sa.Table (
-
-                'assessments', self.__metadata,
-                sa.Column( 'id', sa.UUID, primary_key=True ),
-                sa.Column( 'image_id', sa.UUID, sa.ForeignKey( 'images.id' ) ),
-                sa.Column( 'set_id', sa.UUID, sa.ForeignKey( 'image_sets.id' ) ),
-                sa.Column( 'patient_id', sa.UUID, sa.ForeignKey( 'patients.id' ) ),
-                sa.Column( 'assessment_timestamp', sa.DateTime, nullable=False ),
-                sa.Column( 'assessment', sa.Boolean, nullable=False )
-
-            )
-
-        ]
-
-        self.__metadata.create_all( self.__engine )
+        self.__engine: sa.Engine = sa.create_engine( db_uri, echo=debug )
+    def __get_model_from_table_name( self, table_name: str ) -> Optional[ Any ]:
+        return {
+            'patients': PatientsModel,
+            'image_sets': ImageSetsModel,
+            'images': ImagesModel,
+            'assessments': AssessmentsModel
+        }.get( table_name )
 
     def get_entries_from_id( self, uuid: UUID, table_name: str ) -> Optional[ List[ Dict[ str, Any ] ] ]:
-        table: sa.Table = [ t for t in self.__tables if t.name == table_name ][0]
-        query = sa.select( '*' ).where( table.c.id == uuid )
+
+        model = self.__get_model_from_table_name( table_name )
+
+        if model is None:
+            return None
+
+        query = sa.select( model ).where( model.__tablename__ == uuid )
 
         with self.__engine.begin() as conn:
             result = conn.execute( query ).fetchall()
@@ -69,8 +32,13 @@ class DBhandler():
         return result or None
 
     def create_entry( self, data: dict, table_name: str ) -> Optional[ str ]:
-        table: sa.Table = [ t for t in self.__tables if t.name == table_name ][0]
-        new_entry = table.insert().values( data )
+
+        model = self.__get_model_from_table_name( table_name )
+
+        if model is None:
+            return None
+
+        new_entry = model( **data )
 
         with self.__engine.begin() as conn:
             result = conn.execute( new_entry ).inserted_primary_key or []
