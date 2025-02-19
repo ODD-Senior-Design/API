@@ -16,6 +16,21 @@ class DBhandler():
             'assessments': AssessmentsModel
         }.get( table_name )
 
+    def get_top_entry( self, table_name: str ) -> Optional[ Dict[ str, Any ] ]:
+
+        model = self.__get_model_from_table_name( table_name )
+
+        if model is None:
+            return None
+
+        query = sa.select( model ).order_by( model.id )
+
+        with self.__engine.begin() as conn:
+            result = conn.execute( query ).fetchone()
+            result = result.__dict__ if result else None
+
+        return result
+
     def get_entries_from_id( self, uuid: UUID, table_name: str ) -> Optional[ List[ Dict[ str, Any ] ] ]:
 
         model = self.__get_model_from_table_name( table_name )

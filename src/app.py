@@ -12,6 +12,22 @@ debug_mode: bool = getenv( "DEBUG_MODE" ) == '1'
 db = DBhandler( getenv( "DB_URI" ) or '', debug=debug_mode )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 
+@app.route( '/images', methods=['GET'] )
+def get_latest_image() -> Response:
+    image_entries = db.get_top_entry( 'images' )
+
+    if image_entries is None:
+        abort( 404 )
+
+    image_uri = image_entries.get( 'uri' )
+
+    if image_uri is None:
+        abort( 404, 'No image URI found' )
+
+    schema = ImagesSchema()
+
+    return jsonify( schema.dump( image_entries ) )
+
 @app.route( '/images/<uuid:id>', methods=['GET'] )
 def get_image_uri_from_uuid( id: UUID ) -> Response:
     image_entries = db.get_entries_from_id( id, 'images' )
