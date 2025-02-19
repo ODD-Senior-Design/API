@@ -9,6 +9,7 @@ pandas = "*"
 sqlalchemy = "*"
 requests = "*"
 marshmallow = "*"
+marshmallow-sqlalchemy = "*"
 
 [dev-packages]
 

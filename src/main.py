@@ -1,12 +1,14 @@
 from os import getenv
 from flask import Flask, Response, request, jsonify, abort
+from marshmallow import ValidationError
 from uuid import UUID
 from db_handler import DBhandler
 from webhook_handler import CameraInterface
+from schemas import PatientsSchema, ImageSetsSchema, ImagesSchema, AssessmentsSchema
 
 app: Flask = Flask( getenv( "APP_NAME" ) or 'API' )
 debug_mode: bool = getenv( "DEBUG_MODE" ) == '1'
-db = DBhandler( getenv( "DB_URI" ) or '' )
+db = DBhandler( getenv( "DB_URI" ) or '', debug=debug_mode )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 
 @app.route( '/images/<uuid:id>', methods=['GET'] )
