@@ -66,11 +66,21 @@
                     "type": "string",
                     "format": "uuid"
                 },
+                "patient_id": {
+                    "title": "patient_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
                 "image_set": {
                     "$ref": "#/definitions/ImageSetsSchema"                    
                 },
-                "image_uri": {
-                    "title": "image_url",
+                "image_timestamp": {
+                    "title": "image_timestamp",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "uri": {
+                    "title": "image_uri",
                     "type": "string",
                     "format": "uri"
                 }
@@ -79,8 +89,10 @@
             "required": [
                 "id",
                 "set_id",
+                "patient_id",
                 "image_set",
-                "image_uri"
+                "image_timestamp",
+                "uri"
             ],
             "additionalProperties": false
         },
@@ -99,6 +111,11 @@
                 },
                 "set_id": {
                     "title": "set_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "patient_id": {
+                    "title": "patient_id",
                     "type": "string",
                     "format": "uuid"
                 },
@@ -121,6 +138,7 @@
                 "id",
                 "image_id",
                 "set_id",
+                "patient_id",
                 "image",
                 "assessment_timestamp",
                 "assessment"
