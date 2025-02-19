@@ -42,13 +42,7 @@
                     "format": "uuid"
                 },
                 "patient": {
-                    "title": "patient",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/PatientsSchema"
-                    },
-                    "minItems": 1,
-                    "maxItems": 1
+                    "$ref": "#/definitions/PatientsSchema"
                 }
             },
             "type": "object",
@@ -67,19 +61,13 @@
                     "format": "uuid",
                     "readOnly": true
                 },
-                "image_set_id": {
+                "set_id": {
                     "title": "image_set_id",
                     "type": "string",
                     "format": "uuid"
                 },
                 "image_set": {
-                    "title": "image_set",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ImageSetsSchema"
-                    },
-                    "minItems": 1,
-                    "maxItems": 1
+                    "$ref": "#/definitions/ImageSetsSchema"                    
                 },
                 "image_uri": {
                     "title": "image_url",
@@ -90,7 +78,7 @@
             "type": "object",
             "required": [
                 "id",
-                "image_set_id",
+                "set_id",
                 "image_set",
                 "image_uri"
             ],
@@ -115,13 +103,8 @@
                     "format": "uuid"
                 },
                 "image": {
-                    "title": "image",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ImagesSchema"
-                    },
-                    "minItems": 1,
-                    "maxItems": 1
+                    "$ref": "#/definitions/ImagesSchema"
+
                 },
                 "assessment_timestamp": {
                     "title": "assessment_timestamp",
@@ -137,6 +120,7 @@
             "required": [
                 "id",
                 "image_id",
+                "set_id",
                 "image",
                 "assessment_timestamp",
                 "assessment"
