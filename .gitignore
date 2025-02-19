@@ -1,6 +1,7 @@
 /target
 .history
+.venv
 .pytest_cache
+*cache*
 *.env
-
 *.lock

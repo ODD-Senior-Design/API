@@ -16,7 +16,7 @@ class CameraInterface():
             resp = req.post( url=self.__url, headers=headers or default_header, json=payload, timeout=self.__timeout )
 
         except req.exceptions.RequestException as e:
-            if self.__debug: print( f'Error occurred while capturing image: {e}' )
+            if self.__debug: print( f'Error occurred while capturing image:\n\n{ e }\n\n' )
             return None
 
         return resp.json()

@@ -10,6 +10,7 @@ sqlalchemy = "*"
 requests = "*"
 marshmallow = "*"
 marshmallow-sqlalchemy = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

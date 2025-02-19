@@ -5,7 +5,7 @@
         {
             "previewLimit": 50,
             "driver": "SQLite",
-            "database": "./test.db",
+            "database": "./test/db/test.db",
             "name": "Test DB"
         }
     ],

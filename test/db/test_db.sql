@@ -3,7 +3,7 @@ CREATE TABLE patients (
 
     id TEXT NOT NULL PRIMARY KEY,
     first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
+    last_name TEXT NOT NULL
 
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE images (
     uri TEXT NOT NULL UNIQUE,
 
     FOREIGN KEY (set_id) REFERENCES image_sets(id),
-    FOREIGN KEY (patient_id) REFERENCES patients(id),
+    FOREIGN KEY (patient_id) REFERENCES patients(id)
 
 );
 
@@ -40,11 +40,9 @@ CREATE TABLE assessments (
     set_id TEXT NOT NULL,
     patient_id TEXT NOT NULL,
     assessment_timestamp TEXT NOT NULL,
-    assessment BOOLEAN NOT NULL CHECK ( evaluation IN (0, 1) )
+    assessment BOOLEAN NOT NULL CHECK ( assessment IN (0, 1) ),
 
     FOREIGN KEY (image_id) REFERENCES images(id),
-    FOREIGN KEY (set_id) REFERENCES image_sets(id),
-    FOREIGN KEY (patient_first) REFERENCES image_sets(patient_first),
-    FOREIGN KEY (patient_last) REFERENCES image_sets(patient_last)
+    FOREIGN KEY (set_id) REFERENCES image_sets(id)
 
 );

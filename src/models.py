@@ -1,5 +1,6 @@
 from datetime import datetime
-from sqlalchemy import UUID, ForeignKey
+from uuid import UUID
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import (
 
     DeclarativeBase,
