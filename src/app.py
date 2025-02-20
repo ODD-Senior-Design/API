@@ -128,8 +128,11 @@ def not_found( error_context ): return jsonify( { 'message': f'Object Not Found,
 @app.errorhandler( 500 )
 def internal_server_error( error_context ): return jsonify( { 'message': f'Database/Server Error: { error_context.description }' } ), 500
 
-if __name__ == '__main__':
+def start_app():
     print( 'Loading .env file if present...' )
     load_dotenv()
     print( 'Starting API...' )
     app.run( debug=debug_mode )
+
+if __name__ == '__main__':
+    start_app()
