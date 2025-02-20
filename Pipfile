@@ -13,6 +13,7 @@ marshmallow-sqlalchemy = "*"
 python-dotenv = "*"
 jsf = "*"
 gunicorn = "*"
+flask-cors = "*"
 
 [dev-packages]
 

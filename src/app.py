@@ -1,6 +1,7 @@
 from os import getenv
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, abort
+from flask_cors import CORS
 from marshmallow import ValidationError
 from uuid import UUID
 from db_handler import DBhandler
@@ -9,6 +10,7 @@ from sample_data_generator import DataGenerator
 from schemas import PatientsSchema, ImageSetsSchema, ImagesSchema, AssessmentsSchema
 
 app: Flask = Flask( getenv( "APP_NAME" ) or 'API' )
+cors: CORS = CORS( app )
 debug_mode: bool = getenv( "DEBUG_MODE" ) == '1'
 host_address: str = getenv( "HOST_ADDRESS" ) or '0.0.0.0'
 bind_port: str = getenv( "BIND_PORT" ) or '5000'
