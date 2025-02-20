@@ -46,6 +46,10 @@ print('\n')
 with open( SAMPLE_DATA_JSON_SAVE_PATH, 'w', encoding='utf-8' ) as f:
     json.dump( fake_data, f, ensure_ascii=False, indent=4 )
 
+if not getenv('STORE_TO_DB'):
+    print('No database connection specified. Skipping database operations.')
+    exit(0)
+
 print( getenv( 'DB_URI' ) )
 engine = sa.create_engine( getenv( 'DB_URI' ) or '' )
 
