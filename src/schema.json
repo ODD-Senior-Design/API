@@ -82,7 +82,7 @@
                 "uri": {
                     "title": "image_uri",
                     "type": "string",
-                    "format": "uri"
+                    "$provider": "faker.image_url"
                 }
             },
             "type": "object",
