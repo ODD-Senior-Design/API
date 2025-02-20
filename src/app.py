@@ -10,6 +10,8 @@ from schemas import PatientsSchema, ImageSetsSchema, ImagesSchema, AssessmentsSc
 
 app: Flask = Flask( getenv( "APP_NAME" ) or 'API' )
 debug_mode: bool = getenv( "DEBUG_MODE" ) == '1'
+host_address: str = getenv( "HOST_ADDRESS" ) or '0.0.0.0'
+bind_port: str = getenv( "BIND_PORT" ) or '5000'
 db = DBhandler( getenv( "DB_URI" ) or '', debug=debug_mode )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 
@@ -132,7 +134,7 @@ def start_app():
     print( 'Loading .env file if present...' )
     load_dotenv()
     print( 'Starting API...' )
-    app.run( debug=debug_mode )
+    app.run( debug=debug_mode, host=host_address, port=bind_port)
 
 if __name__ == '__main__':
     start_app()
