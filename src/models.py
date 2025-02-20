@@ -43,7 +43,7 @@ class AssessmentsModel( _Base ):
     id: Mapped[ UUID ] = mapped_column(id_type, primary_key=True )
     image_id: Mapped[ UUID ] = mapped_column( ForeignKey( 'images.id' ) )
     set_id: Mapped[ UUID ] = mapped_column( ForeignKey( 'image_sets.id' ) )
-    patient_id: Mapped[ UUID ] = mapped_column( ForeignKey( 'patient.id' ) )
+    patient_id: Mapped[ UUID ] = mapped_column( ForeignKey( 'patients.id' ) )
     image: Mapped[ ImagesModel ] = relationship( ImagesModel, backref=backref( 'assessments', uselist=False ) )
     assessment_timestamp: Mapped[ datetime ] = mapped_column( nullable=False )
     assessment: Mapped[ bool ] = mapped_column( nullable=False )

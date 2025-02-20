@@ -27,6 +27,7 @@ class ImagesSchema( SQLAlchemyAutoSchema ):
 
     id = auto_field( dump_only=True )
     set_id = auto_field( dump_only=True )
+    patient_id = auto_field( dump_only=True )
 
 class AssessmentsSchema( SQLAlchemyAutoSchema ):
     class Meta:
@@ -38,3 +39,4 @@ class AssessmentsSchema( SQLAlchemyAutoSchema ):
     id = auto_field( dump_only=True )
     image_id = auto_field( dump_only=True )
     set_id = auto_field( dump_only=True )
+    patient_id = auto_field( dump_only=True )
