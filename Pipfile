@@ -12,6 +12,7 @@ marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 python-dotenv = "*"
 jsf = "*"
+gunicorn = "*"
 
 [dev-packages]
 
