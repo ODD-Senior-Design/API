@@ -5,6 +5,7 @@ from marshmallow import ValidationError
 from uuid import UUID
 from db_handler import DBhandler
 from webhook_handler import CameraInterface
+from sample_data_generator import DataGenerator
 from schemas import PatientsSchema, ImageSetsSchema, ImagesSchema, AssessmentsSchema
 
 app: Flask = Flask( getenv( "APP_NAME" ) or 'API' )
@@ -69,6 +70,54 @@ def take_image() -> Response:
         abort( 500, 'No id recieved for new image' )
 
     return jsonify( { "id": image_id } )
+
+@app.route( '/generate', methods=['GET'] )
+def generate__all_sample_data() -> Response:
+    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data()
+    if sample_data is None:
+        abort( 500, 'Sample data could not be generated' )
+    return jsonify( sample_data )
+
+@app.route( '/generate/assessments', methods=['GET'] )
+def generate_assessments_sample_data() -> Response:
+    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data()
+    if sample_data is None:
+        abort( 500, 'Sample data could not be generated' )
+        
+    sample_data = sample_data.get( 'assessments' )
+    return jsonify( sample_data )
+
+@app.route( '/generate/images', methods=['GET'] )
+def generate_images_sample_data() -> Response:
+    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data()
+    if sample_data is None:
+        abort( 500, 'Sample data could not be generated' )
+        
+    sample_data = sample_data.get( 'images' )
+    return jsonify( sample_data )
+
+@app.route( '/generate/sets', methods=['GET'] )
+def generate_sets_sample_data() -> Response:
+    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data()
+    if sample_data is None:
+        abort( 500, 'Sample data could not be generated' )
+        
+    sample_data = sample_data.get( 'image_sets' )
+    return jsonify( sample_data )
+
+@app.route( '/generate/patients', methods=['GET'] )
+def generate_patients_sample_data() -> Response:
+    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data()
+    if sample_data is None:
+        abort( 500, 'Sample data could not be generated' )
+        
+    sample_data = sample_data.get( 'patients' )
+    return jsonify( sample_data )
 
 @app.errorhandler( 400 )
 def bad_request( error_context ): return jsonify( { 'message': f'Bad Request, Additional Info: { error_context.description }' } ), 400

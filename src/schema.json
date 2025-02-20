@@ -1,0 +1,191 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "PatientsSchema": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "first_name": {
+                    "title": "first_name",
+                    "type": "string",
+                    "$provider": "faker.first_name"
+                },
+                "last_name": {
+                    "title": "last_name",
+                    "type": "string",
+                    "$provider": "faker.last_name"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "first_name",
+                "last_name"
+            ],
+            "additionalProperties": false
+        },
+        "ImageSetsSchema": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "patient_id": {
+                    "title": "patient_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "patient": {
+                    "$ref": "#/definitions/PatientsSchema"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "patient_id",
+                "patient"
+                ],
+            "additionalProperties": false
+        },
+        "ImagesSchema": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "set_id": {
+                    "title": "image_set_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "patient_id": {
+                    "title": "patient_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "image_set": {
+                    "$ref": "#/definitions/ImageSetsSchema"                    
+                },
+                "image_timestamp": {
+                    "title": "image_timestamp",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "uri": {
+                    "title": "image_uri",
+                    "type": "string",
+                    "format": "uri"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "set_id",
+                "patient_id",
+                "image_set",
+                "image_timestamp",
+                "uri"
+            ],
+            "additionalProperties": false
+        },
+        "AssessmentsSchema": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "image_id": {
+                    "title": "image_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "set_id": {
+                    "title": "set_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "patient_id": {
+                    "title": "patient_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "image": {
+                    "$ref": "#/definitions/ImagesSchema"
+
+                },
+                "assessment_timestamp": {
+                    "title": "assessment_timestamp",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "assessment": {
+                    "title": "assessment",
+                    "type": "boolean"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "image_id",
+                "set_id",
+                "patient_id",
+                "image",
+                "assessment_timestamp",
+                "assessment"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "type": "object",
+    "properties": {
+        "patients": {
+            "title": "patients",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/PatientsSchema"
+            },
+            "minItems": 1
+        },
+        "image_sets": {
+            "title": "image_sets",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/ImageSetsSchema"
+            },
+            "minItems": 1
+        },
+        "images": {
+            "title": "images",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/ImagesSchema"
+            },
+            "minItems": 1
+        },
+        "assessments": {
+            "title": "assessments",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/AssessmentsSchema"
+            },
+            "minItems": 1
+        }
+    },
+    "required": [
+        "patients",
+        "image_sets",
+        "images",
+        "assessments"
+    ],
+    "additionalProperties": false
+}

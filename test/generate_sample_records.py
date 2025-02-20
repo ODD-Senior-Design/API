@@ -36,7 +36,7 @@ for image in fake_data[ 'images' ]:
 for assessment in fake_data[ 'assessments' ]:
     assessment[ 'image' ][ 'id' ] = assessment[ 'image_id' ]
     assessment[ 'image' ][ 'set_id' ] = assessment[ 'set_id' ]
-    assessment[ 'image' ][ 'set_id' ] = assessment[ 'patient_id' ]
+    assessment[ 'image' ][ 'patient_id' ] = assessment[ 'patient_id' ]
     assessment[ 'image' ][ 'image_set' ][ 'id' ] = assessment[ 'set_id' ]
     assessment[ 'image' ][ 'image_set' ][ 'patient_id' ] = assessment[ 'patient_id' ]
     assessment[ 'image' ][ 'image_set' ][ 'patient' ][ 'id' ] = assessment[ 'patient_id' ]
