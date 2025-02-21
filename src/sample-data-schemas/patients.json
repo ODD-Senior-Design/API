@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {
+            "title": "id",
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+        },
+        "first_name": {
+            "title": "first_name",
+            "type": "string",
+            "$provider": "faker.first_name"
+        },
+        "last_name": {
+            "title": "last_name",
+            "type": "string",
+            "$provider": "faker.last_name"
+        }
+    },
+    "required": [
+        "id",
+        "first_name",
+        "last_name"
+    ]
+}

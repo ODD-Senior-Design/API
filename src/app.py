@@ -1,4 +1,5 @@
 from os import getenv
+from random import randint
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, abort
 from flask_cors import CORS
@@ -13,7 +14,9 @@ app: Flask = Flask( getenv( "APP_NAME" ) or 'API' )
 cors: CORS = CORS( app )
 debug_mode: bool = getenv( "DEBUG_MODE" ) == '1'
 host_address: str = getenv( "HOST_ADDRESS" ) or '0.0.0.0'
-bind_port: str = getenv( "BIND_PORT" ) or '5000'
+bind_port: int = int( getenv( "BIND_PORT" ) or 5000 )
+schema_folder_path: str = getenv( "JSON_SCHEMA_FOLDER_PATH" ) or './src/sample-data-schemas'
+max_samples: int = int( getenv( "MAX_SAMPLES" )  or '5')
 db = DBhandler( getenv( "DB_URI" ) or '', debug=debug_mode )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 
@@ -77,7 +80,7 @@ def take_image() -> Response:
 
 @app.route( '/generate', methods=['GET'] )
 def generate__all_sample_data() -> Response:
-    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    datagen = DataGenerator( f'{ schema_folder_path }/all.json', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
     sample_data = datagen.generate_data()
     if sample_data is None:
         abort( 500, 'Sample data could not be generated' )
@@ -85,42 +88,42 @@ def generate__all_sample_data() -> Response:
 
 @app.route( '/generate/assessments', methods=['GET'] )
 def generate_assessments_sample_data() -> Response:
-    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
-    sample_data = datagen.generate_data()
+    num = request.args.get( 'num', randint(1, max_samples), type=int )
+    datagen = DataGenerator( f'{ schema_folder_path }/assessments.json' or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data( num )
     if sample_data is None:
         abort( 500, 'Sample data could not be generated' )
-        
-    sample_data = sample_data.get( 'assessments' )
+
     return jsonify( sample_data )
 
 @app.route( '/generate/images', methods=['GET'] )
 def generate_images_sample_data() -> Response:
-    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
-    sample_data = datagen.generate_data()
+    num = request.args.get( 'num', randint(1, max_samples), type=int )
+    datagen = DataGenerator( f'{ schema_folder_path }/images.json' or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data( num )
     if sample_data is None:
         abort( 500, 'Sample data could not be generated' )
-        
-    sample_data = sample_data.get( 'images' )
+
     return jsonify( sample_data )
 
 @app.route( '/generate/sets', methods=['GET'] )
 def generate_sets_sample_data() -> Response:
-    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
-    sample_data = datagen.generate_data()
+    num = request.args.get( 'num', randint(1, max_samples), type=int )
+    datagen = DataGenerator( f'{ schema_folder_path }/sets.json' or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data( num )
     if sample_data is None:
         abort( 500, 'Sample data could not be generated' )
-        
-    sample_data = sample_data.get( 'image_sets' )
+
     return jsonify( sample_data )
 
 @app.route( '/generate/patients', methods=['GET'] )
 def generate_patients_sample_data() -> Response:
-    datagen = DataGenerator( getenv( 'JSON_SCHEMA_PATH' ) or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
-    sample_data = datagen.generate_data()
+    num = request.args.get( 'num', randint(1, max_samples), type=int )
+    datagen = DataGenerator( f'{ schema_folder_path }/patients.json' or '', debug_mode | ( getenv( 'SAVE_SAMPLE_DATA_TO_JSON' ) is not None ), getenv( 'SAMPLE_DATA_JSON_SAVE_PATH' ) )
+    sample_data = datagen.generate_data( num )
     if sample_data is None:
         abort( 500, 'Sample data could not be generated' )
-        
-    sample_data = sample_data.get( 'patients' )
+
     return jsonify( sample_data )
 
 @app.errorhandler( 400 )
@@ -136,7 +139,7 @@ def start_app():
     print( 'Loading .env file if present...' )
     load_dotenv()
     print( 'Starting API...' )
-    app.run( debug=debug_mode, host=host_address, port=bind_port)
+    app.run( debug=debug_mode, host=host_address, port=bind_port )
 
 if __name__ == '__main__':
     start_app()

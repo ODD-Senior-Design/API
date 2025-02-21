@@ -1,0 +1,95 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "PatientsSchema": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "first_name": {
+                    "title": "first_name",
+                    "type": "string",
+                    "$provider": "faker.first_name"
+                },
+                "last_name": {
+                    "title": "last_name",
+                    "type": "string",
+                    "$provider": "faker.last_name"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "first_name",
+                "last_name"
+            ]
+        },
+        "ImageSetsSchema": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "patient_id": {
+                    "title": "patient_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "patient": {
+                    "$ref": "#/definitions/PatientsSchema"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "patient_id",
+                "patient"
+                ]
+        }
+    },
+    "type": "object",
+    "properties": {
+        "id": {
+            "title": "id",
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+        },
+        "set_id": {
+            "title": "image_set_id",
+            "type": "string",
+            "format": "uuid"
+        },
+        "patient_id": {
+            "title": "patient_id",
+            "type": "string",
+            "format": "uuid"
+        },
+        "image_set": {
+            "$ref": "#/definitions/ImageSetsSchema"                    
+        },
+        "image_timestamp": {
+            "title": "image_timestamp",
+            "type": "string",
+            "format": "date-time"
+        },
+        "uri": {
+            "title": "image_uri",
+            "type": "string",
+            "$provider": "faker.image_url"
+        }
+    },
+    "required": [
+        "id",
+        "set_id",
+        "patient_id",
+        "image_set",
+        "image_timestamp",
+        "uri"
+    ]
+}

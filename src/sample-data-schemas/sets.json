@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "file:patients.json",
+    "definitions": {
+        "PatientsSchema": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "first_name": {
+                    "title": "first_name",
+                    "type": "string",
+                    "$provider": "faker.first_name"
+                },
+                "last_name": {
+                    "title": "last_name",
+                    "type": "string",
+                    "$provider": "faker.last_name"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "first_name",
+                "last_name"
+            ]
+        }
+    },
+    "type": "object",
+    "properties": {
+        "id": {
+            "title": "id",
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+        },
+        "patient_id": {
+            "title": "patient_id",
+            "type": "string",
+            "format": "uuid"
+        },
+        "patient": {
+            "$ref": "#/definitions/PatientsSchema"
+        }
+    },
+    "required": [
+        "id",
+        "patient_id",
+        "patient"
+    ]
+
+}
