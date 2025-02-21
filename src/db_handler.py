@@ -40,11 +40,11 @@ class DBhandler():
         if model is None:
             return None
 
-        query = sa.select( model ).where( model.__tablename__ == uuid )
+        query = sa.select( model ).where( model.id == str(uuid) )
 
         with self.__engine.begin() as conn:
             result = conn.execute( query ).fetchall()
-            result = list( map( lambda r: { str( column.name ): getattr( r, column.name ) for column in r.__table__.columns }, result ) ) # Dict expansion to convert the `Row` type to a `Dict` type
+            result = list( map( lambda r: r._asdict(), result ) ) # Dict expansion to convert the `Row` type to a `Dict` type
 
         return result or None
 

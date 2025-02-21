@@ -25,33 +25,21 @@ def get_latest_image() -> Response:
     image_entries = db.get_top_entry( 'images', 'image_timestamp' )
 
     if image_entries is None:
-        abort( 404 )
+        abort( 404, 'No images saved' )
 
-    image_uri = image_entries.get( 'uri' )
+    return jsonify( image_entries )
 
-    if image_uri is None:
-        abort( 404, 'No image URI found' )
-
-    schema = ImagesSchema()
-
-    return jsonify( schema.dump( image_entries ) )
-
-@app.route( '/images/<uuid:id>', methods=['GET'] )
-def get_image_uri_from_uuid( id: UUID ) -> Response:
-    image_entries = db.get_entries_from_id( id, 'images' )
+@app.route( '/images/<uuid:uid>', methods=['GET'] )
+def get_image_from_uuid( uid: UUID ) -> Response:
+    image_entries = db.get_entries_from_id( uid, 'images' )
 
     if image_entries is None:
-        abort( 404 )
+        abort( 404, 'No images with that UUID' )
 
     if len( image_entries ) > 1:
         abort( 500, 'Duplicate uuids found' )
 
-    image_uri = image_entries[0].get( 'uri' )
-
-    if image_uri is None:
-        abort( 404, 'No image URI found' )
-
-    return jsonify( image_uri )
+    return jsonify( image_entries[0] )
 
 @app.route( '/images', methods=['POST'] )
 def take_image() -> Response:
