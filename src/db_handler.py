@@ -1,5 +1,4 @@
 import sqlalchemy as sa
-from sqlalchemy import desc
 from uuid import UUID
 from typing import Optional, List, Dict, Any
 from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
@@ -25,7 +24,7 @@ class DBhandler():
             return None
 
 
-        query = sa.select( model ).order_by( desc( order ) )
+        query = sa.select( model ).order_by( sa.desc( order ) )
 
         with self.__engine.begin() as conn:
             result = conn.execute( query ).fetchone()
@@ -46,9 +45,9 @@ class DBhandler():
             result = conn.execute( query ).fetchall()
             result = list( map( lambda r: r._asdict(), result ) ) # Dict expansion to convert the `Row` type to a `Dict` type
 
-        return result or None
+        return result
 
-    def create_entry( self, data: dict, table_name: str ) -> Optional[ str ]:
+    def create_entry( self, data: dict, table_name: str ) -> Optional[ Dict[ str, Any ] ]:
 
         model = self.__get_model_from_table_name( table_name )
 
@@ -59,5 +58,7 @@ class DBhandler():
 
         with self.__engine.begin() as conn:
             result = conn.execute( new_entry ).inserted_primary_key or []
+            result = conn.execute( sa.select( model ).where( model.id == str( result ) ) ).fetchone()
+            result = result._asdict() if result else None
 
-        return result[0] or None
+        return result

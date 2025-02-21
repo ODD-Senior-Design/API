@@ -1,5 +1,5 @@
 import requests as req
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 
 class CameraInterface():
 
@@ -8,7 +8,7 @@ class CameraInterface():
         self.__timeout = timeout
         self.__debug = debug
 
-    def capture_image( self, payload: dict, headers: Optional[ Dict ] = None ) -> Optional[ Dict ]:
+    def capture_image( self, payload: dict, headers: Optional[ Dict ] = None ) -> Optional[ Dict[ str, Any ] ]:
         # sourcery skip: default-mutable-arg
         default_header = { 'Content-type': 'application/json' }
 

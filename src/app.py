@@ -22,24 +22,29 @@ ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 
 @app.route( '/images', methods=['GET'] )
 def get_latest_image() -> Response:
-    image_entries = db.get_top_entry( 'images', 'image_timestamp' )
+    image_entries = db.get_top_entry( table_name='images', order='image_timestamp' )
 
     if image_entries is None:
         abort( 404, 'No images saved' )
 
-    return jsonify( image_entries )
+    schema = ImagesSchema()
+
+    return jsonify( schema.dump( image_entries ) )
 
 @app.route( '/images/<uuid:uid>', methods=['GET'] )
 def get_image_from_uuid( uid: UUID ) -> Response:
-    image_entries = db.get_entries_from_id( uid, 'images' )
+    image = db.get_entries_from_id( uuid=uid, table_name='images' )
 
-    if image_entries is None:
+    if image is None:
         abort( 404, 'No images with that UUID' )
 
-    if len( image_entries ) > 1:
+    if len( image ) > 1:
         abort( 500, 'Duplicate uuids found' )
 
-    return jsonify( image_entries[0] )
+    image = image.pop()
+    schema = ImagesSchema()
+
+    return jsonify( schema.dump( image ) )
 
 @app.route( '/images', methods=['POST'] )
 def take_image() -> Response:
@@ -51,13 +56,10 @@ def take_image() -> Response:
     except ValidationError as e:
         abort( 400, e.messages )
 
-    resp = ci.capture_image( payload=patient_data )
+    image_data = ci.capture_image( payload=patient_data )
 
-    if resp is None:
+    if image_data is None:
         abort( 500, 'Failed to capture image' )
-
-    image_data = patient_data.copy()
-    image_data['uri'] = resp.get( 'uri' )
 
     image_id = db.create_entry( data=image_data, table_name='images' )
 
