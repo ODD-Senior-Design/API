@@ -22,7 +22,7 @@ ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 
 @app.route( '/images', methods=['GET'] )
 def get_latest_image() -> Response:
-    image_entries = db.get_top_entry( 'images' )
+    image_entries = db.get_top_entry( 'images', 'image_timestamp' )
 
     if image_entries is None:
         abort( 404 )

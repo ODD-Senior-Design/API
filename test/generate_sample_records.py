@@ -2,6 +2,7 @@ from datetime import datetime
 from os import getenv
 from dotenv import load_dotenv
 from jsf import JSF
+from typing import Dict, Any
 import json
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
@@ -9,15 +10,16 @@ import sys
 sys.path.insert(0, r'./src/')
 from models import PatientsModel, ImagesModel, ImageSetsModel, AssessmentsModel
 
-SAMPLE_SCHEMA_JSON_PATH = './test/sample_schema.json'
-SAMPLE_DATA_JSON_SAVE_PATH = './test/sample_data.json'
+fake_data_SCHEMA_JSON_PATH = './test/sample_schema.json'
+fake_data_JSON_SAVE_PATH = './test/fake_data.json'
 TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S+00:00'
+STORE_TO_DB = True
 OVERRIDE_DB = True
 
-with open(SAMPLE_SCHEMA_JSON_PATH, 'r') as f:
+with open(fake_data_SCHEMA_JSON_PATH, 'r') as f:
     print( json.load( f ) )
 
-jsf = JSF.from_json( SAMPLE_SCHEMA_JSON_PATH )
+jsf = JSF.from_json( fake_data_SCHEMA_JSON_PATH )
 fake_data = jsf.generate()
 print('\n')
 print( fake_data )
@@ -25,28 +27,35 @@ print( fake_data )
 # Replace sub-oobject ids with super objects id
 
 # Replace image_sets.patient.id with image_sets.patient_id
-for set in fake_data[ 'image_sets' ]:
-    set[ 'patient' ][ 'id' ] = set[ 'patient_id' ]
+def fix_inconsistencies( data: dict ) -> Dict[ str, Any ]:
 
-for image in fake_data[ 'images' ]:
-    image[ 'image_set' ][ 'id' ] = image[ 'set_id' ]
-    image[ 'image_set' ][ 'patient_id' ] = image[ 'patient_id' ]
-    image[ 'image_set' ][ 'patient' ][ 'id' ] = image[ 'image_set' ][ 'patient_id' ]
+    if data.get( 'image_id' ):
+        data[ 'image' ].update( { 'id': data[ 'image_id' ], 'set_id': data[ 'set_id' ], 'patient_id': data[ 'patient_id' ] } )
+        data[ 'image' ][ 'image_set' ].update( { 'id': data[ 'set_id' ], 'patient_id': data[ 'patient_id' ] } )
+        data[ 'image' ][ 'image_set' ][ 'patient' ][ 'id' ] = data[ 'patient_id' ]
 
-for assessment in fake_data[ 'assessments' ]:
-    assessment[ 'image' ][ 'id' ] = assessment[ 'image_id' ]
-    assessment[ 'image' ][ 'set_id' ] = assessment[ 'set_id' ]
-    assessment[ 'image' ][ 'patient_id' ] = assessment[ 'patient_id' ]
-    assessment[ 'image' ][ 'image_set' ][ 'id' ] = assessment[ 'set_id' ]
-    assessment[ 'image' ][ 'image_set' ][ 'patient_id' ] = assessment[ 'patient_id' ]
-    assessment[ 'image' ][ 'image_set' ][ 'patient' ][ 'id' ] = assessment[ 'patient_id' ]
+    elif data.get( 'set_id' ):
+        data[ 'image_set' ].update( { 'id': data[ 'set_id' ], 'patient_id': data[ 'patient_id' ] } )
+        data[ 'image_set' ][ 'patient' ][ 'id' ] = data[ 'patient_id' ]
+
+    elif data.get( 'patient_id' ):
+        data[ 'patient' ][ 'id' ] = data[ 'patient_id' ]
+
+
+
+    return data.copy()
+
+fake_data[ 'assessments' ] = [ fix_inconsistencies( a ) for a in fake_data[ 'assessments' ] ]
+fake_data[ 'images' ] = [ fix_inconsistencies( i ) for i in fake_data[ 'images' ] ]
+fake_data[ 'image_sets' ] = [ fix_inconsistencies( s ) for s in fake_data[ 'image_sets' ] ]
+fake_data[ 'patients' ] = [ fix_inconsistencies( p ) for p in fake_data[ 'patients' ] ]
 
 print('\n')
 
-with open( SAMPLE_DATA_JSON_SAVE_PATH, 'w', encoding='utf-8' ) as f:
+with open( fake_data_JSON_SAVE_PATH, 'w', encoding='utf-8' ) as f:
     json.dump( fake_data, f, ensure_ascii=False, indent=4 )
 
-if not getenv('STORE_TO_DB'):
+if not STORE_TO_DB:
     print('No database connection specified. Skipping database operations.')
     exit(0)
 
@@ -107,7 +116,7 @@ with Session(engine) as conn:
     conn.add_all( insert_image_sets )
     conn.add_all( insert_patients )
     conn.commit()
-    
+
     result = conn.execute( query ).fetchall()
     for r in result:
         print( r._asdict().get( 'AssessmentsModel' ).__dict__ )

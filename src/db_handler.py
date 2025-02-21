@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy import desc
 from uuid import UUID
 from typing import Optional, List, Dict, Any
 from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
@@ -16,18 +17,19 @@ class DBhandler():
             'assessments': AssessmentsModel
         }.get( table_name )
 
-    def get_top_entry( self, table_name: str ) -> Optional[ Dict[ str, Any ] ]:
+    def get_top_entry( self, table_name: str, order='id' ) -> Optional[ Dict[ str, Any ] ]:
 
         model = self.__get_model_from_table_name( table_name )
 
         if model is None:
             return None
 
-        query = sa.select( model ).order_by( model.id )
+
+        query = sa.select( model ).order_by( desc( order ) )
 
         with self.__engine.begin() as conn:
             result = conn.execute( query ).fetchone()
-            result = result.__dict__ if result else None
+            result = result._asdict() if result else None
 
         return result
 
