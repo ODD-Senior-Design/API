@@ -1,0 +1,259 @@
+{
+    "patients": [
+        {
+            "id": "d0735b01-2343-4ae4-a5de-0128a9f59f03",
+            "first_name": "Sheila",
+            "last_name": "Cervantes"
+        },
+        {
+            "id": "485889db-2be4-4d0f-b944-ea92561a7f24",
+            "first_name": "Darryl",
+            "last_name": "Ramirez"
+        },
+        {
+            "id": "409f780d-c818-48f1-922b-eaf2933d2c30",
+            "first_name": "Wesley",
+            "last_name": "Owens"
+        },
+        {
+            "id": "8b7a9b16-1f07-42ea-9c79-b21a3dc11db0",
+            "first_name": "Dawn",
+            "last_name": "Browning"
+        }
+    ],
+    "image_sets": [
+        {
+            "id": "c46eb26c-85a8-4f23-93f3-20781f91b95a",
+            "patient_id": "0e7feae0-40cc-4ef8-8ca2-ead556789a7e",
+            "patient": {
+                "id": "0e7feae0-40cc-4ef8-8ca2-ead556789a7e",
+                "first_name": "Charles",
+                "last_name": "Bell"
+            }
+        },
+        {
+            "id": "dc957a38-5dc5-4454-b25d-08558b6a6a17",
+            "patient_id": "59f4af6f-e479-44de-9a17-41e7385fedf4",
+            "patient": {
+                "id": "59f4af6f-e479-44de-9a17-41e7385fedf4",
+                "first_name": "Holly",
+                "last_name": "Lucero"
+            }
+        },
+        {
+            "id": "63a44109-b644-4eed-ba25-1c209976df7f",
+            "patient_id": "fb3f8d6b-8e31-4689-a93b-0e5ddc3cfd7a",
+            "patient": {
+                "id": "fb3f8d6b-8e31-4689-a93b-0e5ddc3cfd7a",
+                "first_name": "Cynthia",
+                "last_name": "Thompson"
+            }
+        },
+        {
+            "id": "ba769f1d-f586-4ba2-abe0-d909abbea754",
+            "patient_id": "0682009a-96d0-4186-a739-b454b961202e",
+            "patient": {
+                "id": "0682009a-96d0-4186-a739-b454b961202e",
+                "first_name": "Micheal",
+                "last_name": "Brown"
+            }
+        },
+        {
+            "id": "aadf43e5-b6fc-4e02-a1f7-8de93caaa7af",
+            "patient_id": "6ef72481-4a12-455c-809f-d7ccbabbad81",
+            "patient": {
+                "id": "6ef72481-4a12-455c-809f-d7ccbabbad81",
+                "first_name": "Michelle",
+                "last_name": "Jenkins"
+            }
+        }
+    ],
+    "images": [
+        {
+            "id": "e04843c3-6104-4496-bf66-8db87d21ed42",
+            "set_id": "9db19263-51fc-4f3c-b0c9-f88fbc668376",
+            "patient_id": "5e042ce5-3d07-42ec-9b19-9cb1bcadf2a7",
+            "image_set": {
+                "id": "9db19263-51fc-4f3c-b0c9-f88fbc668376",
+                "patient_id": "5e042ce5-3d07-42ec-9b19-9cb1bcadf2a7",
+                "patient": {
+                    "id": "5e042ce5-3d07-42ec-9b19-9cb1bcadf2a7",
+                    "first_name": "Brian",
+                    "last_name": "Wallace"
+                }
+            },
+            "image_timestamp": "2006-08-18T15:15:30+00:00",
+            "uri": "https://placekitten.com/696/770"
+        },
+        {
+            "id": "3be6a872-b7a0-4196-814a-d3b3d344037c",
+            "set_id": "99d3c8d6-f799-4b48-8c02-99560b0967c4",
+            "patient_id": "ec9d7d00-5410-48d3-9f89-e0ef28d2a26c",
+            "image_set": {
+                "id": "99d3c8d6-f799-4b48-8c02-99560b0967c4",
+                "patient_id": "ec9d7d00-5410-48d3-9f89-e0ef28d2a26c",
+                "patient": {
+                    "id": "ec9d7d00-5410-48d3-9f89-e0ef28d2a26c",
+                    "first_name": "Lisa",
+                    "last_name": "Fox"
+                }
+            },
+            "image_timestamp": "2005-01-07T13:13:12+00:00",
+            "uri": "https://dummyimage.com/566x442"
+        },
+        {
+            "id": "4fac2ab3-12bb-43a3-a32f-02db7170c2fc",
+            "set_id": "632e64ff-54b4-49b6-8b06-82bfdf45f4e9",
+            "patient_id": "9f7d1129-ee02-4651-ac89-4b0ca0379d53",
+            "image_set": {
+                "id": "632e64ff-54b4-49b6-8b06-82bfdf45f4e9",
+                "patient_id": "9f7d1129-ee02-4651-ac89-4b0ca0379d53",
+                "patient": {
+                    "id": "9f7d1129-ee02-4651-ac89-4b0ca0379d53",
+                    "first_name": "Jack",
+                    "last_name": "Willis"
+                }
+            },
+            "image_timestamp": "1995-12-20T06:53:00+00:00",
+            "uri": "https://placekitten.com/53/826"
+        },
+        {
+            "id": "33533b12-f665-4547-9c8c-d0dc4d558574",
+            "set_id": "9dd374d4-94b1-49eb-80e7-416f2b1c9f97",
+            "patient_id": "f13992b5-7734-4713-aa37-e94b5f268316",
+            "image_set": {
+                "id": "9dd374d4-94b1-49eb-80e7-416f2b1c9f97",
+                "patient_id": "f13992b5-7734-4713-aa37-e94b5f268316",
+                "patient": {
+                    "id": "f13992b5-7734-4713-aa37-e94b5f268316",
+                    "first_name": "Eric",
+                    "last_name": "Cobb"
+                }
+            },
+            "image_timestamp": "2022-07-01T06:16:39+00:00",
+            "uri": "https://picsum.photos/382/425"
+        }
+    ],
+    "assessments": [
+        {
+            "id": "c08855b9-7559-4294-8ab4-45d4919dc40d",
+            "image_id": "c71a5417-ed21-40d6-a496-90ad94f0ab6d",
+            "set_id": "8a8c5c9c-367b-4227-b75a-a6cf26ebe76b",
+            "patient_id": "caad3f22-d16a-49b6-b622-0f40ac9c020d",
+            "image": {
+                "id": "c71a5417-ed21-40d6-a496-90ad94f0ab6d",
+                "set_id": "8a8c5c9c-367b-4227-b75a-a6cf26ebe76b",
+                "patient_id": "caad3f22-d16a-49b6-b622-0f40ac9c020d",
+                "image_set": {
+                    "id": "8a8c5c9c-367b-4227-b75a-a6cf26ebe76b",
+                    "patient_id": "caad3f22-d16a-49b6-b622-0f40ac9c020d",
+                    "patient": {
+                        "id": "caad3f22-d16a-49b6-b622-0f40ac9c020d",
+                        "first_name": "James",
+                        "last_name": "Gallagher"
+                    }
+                },
+                "image_timestamp": "1988-07-28T15:29:16+00:00",
+                "uri": "https://dummyimage.com/290x269"
+            },
+            "assessment_timestamp": "1974-01-10T17:47:13+00:00",
+            "assessment": true
+        },
+        {
+            "id": "6da43582-d7d2-4007-89d0-68332207e8d5",
+            "image_id": "e5c11acd-f776-49f0-8832-7b91d05af9fe",
+            "set_id": "ebe3d393-01f1-4ca3-a77d-483dc1b6c764",
+            "patient_id": "fbb7bd3c-ee9a-4a03-ac96-13ad6a580060",
+            "image": {
+                "id": "e5c11acd-f776-49f0-8832-7b91d05af9fe",
+                "set_id": "ebe3d393-01f1-4ca3-a77d-483dc1b6c764",
+                "patient_id": "fbb7bd3c-ee9a-4a03-ac96-13ad6a580060",
+                "image_set": {
+                    "id": "ebe3d393-01f1-4ca3-a77d-483dc1b6c764",
+                    "patient_id": "fbb7bd3c-ee9a-4a03-ac96-13ad6a580060",
+                    "patient": {
+                        "id": "fbb7bd3c-ee9a-4a03-ac96-13ad6a580060",
+                        "first_name": "Cameron",
+                        "last_name": "Gates"
+                    }
+                },
+                "image_timestamp": "1997-11-14T04:18:18+00:00",
+                "uri": "https://picsum.photos/761/711"
+            },
+            "assessment_timestamp": "1987-02-05T06:06:48+00:00",
+            "assessment": false
+        },
+        {
+            "id": "96292d6f-3bec-4a37-a4bd-6044449ed45a",
+            "image_id": "0930b0ca-2d99-4b97-a03d-95814899ac8c",
+            "set_id": "19617aa9-66ed-4ab5-8a88-da6360f537cd",
+            "patient_id": "97385128-3107-44b7-bccb-f6c0598fd366",
+            "image": {
+                "id": "0930b0ca-2d99-4b97-a03d-95814899ac8c",
+                "set_id": "19617aa9-66ed-4ab5-8a88-da6360f537cd",
+                "patient_id": "97385128-3107-44b7-bccb-f6c0598fd366",
+                "image_set": {
+                    "id": "19617aa9-66ed-4ab5-8a88-da6360f537cd",
+                    "patient_id": "97385128-3107-44b7-bccb-f6c0598fd366",
+                    "patient": {
+                        "id": "97385128-3107-44b7-bccb-f6c0598fd366",
+                        "first_name": "Donald",
+                        "last_name": "Smith"
+                    }
+                },
+                "image_timestamp": "1976-10-04T20:21:47+00:00",
+                "uri": "https://picsum.photos/832/37"
+            },
+            "assessment_timestamp": "1995-04-25T06:32:42+00:00",
+            "assessment": true
+        },
+        {
+            "id": "4a5ce3cb-6a90-4c9e-9f76-501da536c54b",
+            "image_id": "d583b49c-cf18-416e-b222-f663e517087d",
+            "set_id": "394e6249-24cc-4ad9-926d-8fb9169aae83",
+            "patient_id": "44a60141-5062-40a7-bb65-43dac90050fe",
+            "image": {
+                "id": "d583b49c-cf18-416e-b222-f663e517087d",
+                "set_id": "394e6249-24cc-4ad9-926d-8fb9169aae83",
+                "patient_id": "44a60141-5062-40a7-bb65-43dac90050fe",
+                "image_set": {
+                    "id": "394e6249-24cc-4ad9-926d-8fb9169aae83",
+                    "patient_id": "44a60141-5062-40a7-bb65-43dac90050fe",
+                    "patient": {
+                        "id": "44a60141-5062-40a7-bb65-43dac90050fe",
+                        "first_name": "Trevor",
+                        "last_name": "Jones"
+                    }
+                },
+                "image_timestamp": "2014-08-01T21:27:50+00:00",
+                "uri": "https://picsum.photos/319/476"
+            },
+            "assessment_timestamp": "1992-11-19T16:38:29+00:00",
+            "assessment": false
+        },
+        {
+            "id": "66a8621c-661a-4f53-8012-b2e2a8c2b3ff",
+            "image_id": "cb6691a5-b7fd-4576-b896-4802c383bb61",
+            "set_id": "ea9cb4cb-52e1-47ef-880c-e7cede80ed23",
+            "patient_id": "21fb2167-7e0c-4f22-8182-44bd39fdd859",
+            "image": {
+                "id": "cb6691a5-b7fd-4576-b896-4802c383bb61",
+                "set_id": "ea9cb4cb-52e1-47ef-880c-e7cede80ed23",
+                "patient_id": "21fb2167-7e0c-4f22-8182-44bd39fdd859",
+                "image_set": {
+                    "id": "ea9cb4cb-52e1-47ef-880c-e7cede80ed23",
+                    "patient_id": "21fb2167-7e0c-4f22-8182-44bd39fdd859",
+                    "patient": {
+                        "id": "21fb2167-7e0c-4f22-8182-44bd39fdd859",
+                        "first_name": "Kara",
+                        "last_name": "Mitchell"
+                    }
+                },
+                "image_timestamp": "1974-10-09T19:43:08+00:00",
+                "uri": "https://picsum.photos/975/187"
+            },
+            "assessment_timestamp": "2016-12-17T02:36:29+00:00",
+            "assessment": false
+        }
+    ]
+}
