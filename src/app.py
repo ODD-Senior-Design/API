@@ -1,5 +1,6 @@
 from os import getenv
 from random import randint
+from typing import Any
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, abort
 from flask_cors import CORS
@@ -19,6 +20,7 @@ host_address: str = getenv( "HOST_ADDRESS" ) or '0.0.0.0'
 bind_port: int = int( getenv( "BIND_PORT" ) or 5000 )
 schema_folder_path: str = getenv( "JSON_SCHEMA_FOLDER_PATH" ) or './src/sample-data-schemas'
 max_samples: int = int( getenv( "MAX_SAMPLES" )  or '5')
+datetime_format: str = getenv( "DATETIME_FORMAT" ) or '%Y-%m-%dT%H:%M:%S'
 db = DBhandler( getenv( "DB_URI" ) or '', debug=debug_mode )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 ai = AIInterface( getenv( "AI_INTERFACE_URL" ) or '', debug=debug_mode )
@@ -65,41 +67,31 @@ def take_image() -> Response:
     if image_metadata is None:
         abort( 500, 'Failed to insert new image entry' )
 
-    return jsonify( image_metadata )
+    schema = ImagesSchema()
+
+    return jsonify( schema.dump( image_metadata ) )
 
 @app.route( '/assessments', methods=['POST'] )
 def assess_image() -> Response:
-    image_data: dict = request.get_json()
+    ids: dict[str, Any] = request.get_json()
     schema = AssessmentsSchema()
 
     try:
-        image_data = schema.load( image_data )
+        ids = schema.load( ids )
     except ValidationError as e:
         abort( 400, e.messages )
 
-    assessment_data = ai.analyze_image( image_data ) or { 'assessment': True, 'assessment_timestamp': datetime.now() }
+    assessment_data = ai.analyze_image( ids )
 
     if assessment_data is None:
         abort( 500, 'Failed to analyze image' )
 
-    assessment_data.update( image_data )
-    assessment_data.update( { 'id': 'a6158250-f9cb-1f87-b5bc-a40d93d9d15b' } ) #! TEMPORARY! FOR TESTING ONLY
-    assessment_metadata = assessment_data #db.create_entry( data=assessment_data, table_name='assessments' )
+    assessment_data.update( ids )
 
-    if assessment_metadata is None:
+    assessment_data = db.create_entry( data=assessment_data, table_name='assessments' )
+
+    if assessment_data is None:
         abort( 500, 'Failed to insert new assessment entry' )
-
-    image_data = db.get_entry_from_id( uuid=image_data.get( 'image_id', '' ), table_name='images' ) or {}
-
-    if image_data == {}:
-        abort( 500, 'Failed to retrieve image data' )
-
-    image_data.update( { 'image_set': { 'id': image_data[ 'set_id' ], 'patient_id': image_data[ 'patient_id' ], 'patient': {} } } )
-    image_data[ 'image_set' ].update( { 'patient': db.get_entry_from_id( uuid=image_data.get( 'patient_id', '' ), table_name='patients' ) or {} } )
-
-    image_schema = ImagesSchema()
-
-    assessment_metadata['image'] = image_schema.dump( image_data )
 
     return jsonify( schema.dump( assessment_data ) )
 

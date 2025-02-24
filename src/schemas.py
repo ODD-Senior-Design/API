@@ -10,7 +10,6 @@ class PatientsSchema( SQLAlchemyAutoSchema ):
         load_instance = False
 
     id = auto_field( dump_only=True )
-
 class ImageSetsSchema( SQLAlchemyAutoSchema ):
     class Meta:
         model = ImageSetsModel
@@ -30,7 +29,7 @@ class ImagesSchema( SQLAlchemyAutoSchema ):
 
     id = auto_field( dump_only=True )
     image_timestamp = auto_field( dump_only=True )
-    image_set = Related()
+    image_set = auto_field( dump_only=True )
 
 class AssessmentsSchema( SQLAlchemyAutoSchema ):
     class Meta:
@@ -42,4 +41,4 @@ class AssessmentsSchema( SQLAlchemyAutoSchema ):
     id = auto_field( dump_only=True )
     assessment = auto_field( dump_only=True )
     assessment_timestamp = auto_field( dump_only=True )
-    image = Related()
+    image = auto_field( dump_only=True )

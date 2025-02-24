@@ -35,7 +35,7 @@ class DBhandler():
         except Exception as e:
             print( f'Error occurred while fetching top entry: { e }' )
             return None
-    
+
         return result
 
     def get_entry_from_id( self, uuid: UUID, table_name: str ) -> Optional[ Dict[ str, Any ] ]:
@@ -68,17 +68,16 @@ class DBhandler():
 
         new_entry = model( **data )
         uid = UUID( hex=secrets.token_hex( 16 ) )
-        
+
         while self.get_entry_from_id( uid, table_name=table_name ) is not None:
             uid = UUID( hex=secrets.token_hex( 16 ) )
-        
+
         new_entry.id = str( uid )
 
         try:
             with Session( self.__engine ) as conn:
                 conn.add( new_entry )
                 conn.commit()
-                
                 result = conn.execute( sa.select( model ).where( model.id == str( uid ) ) ).fetchone()
                 result = result._asdict() if result else None
 
