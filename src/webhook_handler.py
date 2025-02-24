@@ -31,7 +31,7 @@ class AIInterface():
     def analyze_image( self, payload: dict, headers: Optional[ Dict ] = None ) -> Optional[ Dict[ str, Any ] ]:
         # sourcery skip: default-mutable-arg
         default_header = { 'Content-type': 'application/json' }
-        
+
         try:
             resp = req.post( url=self.__url, headers=headers or default_header, json=payload, timeout=self.__timeout )
 

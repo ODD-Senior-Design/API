@@ -34,7 +34,7 @@ class ImagesModel( _Base ):
     id: Mapped[ UUID ] = mapped_column( id_type, primary_key=True )
     set_id: Mapped[ UUID ] = mapped_column( ForeignKey( 'image_sets.id' ) )
     patient_id: Mapped[ UUID ] = mapped_column( ForeignKey( 'patients.id' ) )
-    set: Mapped[ ImageSetsModel ] = relationship( ImageSetsModel, backref=backref( 'images', uselist=False ) )
+    image_set: Mapped[ ImageSetsModel ] = relationship( ImageSetsModel, backref=backref( 'images', uselist=False ) )
     image_timestamp: Mapped[ datetime ] = mapped_column( nullable=False )
     uri: Mapped[ str ] = mapped_column( nullable=False, unique=True )
 

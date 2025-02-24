@@ -22,8 +22,6 @@ class DataGenerator():
         elif data.get( 'patient_id' ):
             data[ 'patient' ][ 'id' ] = data[ 'patient_id' ]
 
-
-
         return data.copy()
 
     def generate_data( self, num=1 ) -> Optional[ List[ Dict[ str, Any ] ] ]:

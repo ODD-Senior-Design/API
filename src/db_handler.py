@@ -1,4 +1,6 @@
 import sqlalchemy as sa
+from sqlalchemy.orm import Session
+import secrets
 from uuid import UUID
 from typing import Optional, List, Dict, Any
 from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
@@ -49,11 +51,12 @@ class DBhandler():
             with self.__engine.begin() as conn:
                 result = conn.execute( query ).fetchone()
                 result = result._asdict() if result else None
-
+                
         except Exception as e:
             print( f'Error occurred while fetching entry by ID: { e }' )
             return None
 
+        print(result)
         return result
 
     def create_entry( self, data: dict, table_name: str ) -> Optional[ Dict[ str, Any ] ]:
@@ -64,15 +67,24 @@ class DBhandler():
             return None
 
         new_entry = model( **data )
+        uid = UUID( hex=secrets.token_hex( 16 ) )
+        
+        while self.get_entry_from_id( uid, table_name=table_name ) is not None:
+            uid = UUID( hex=secrets.token_hex( 16 ) )
+        
+        new_entry.id = str( uid )
 
         try:
-            with self.__engine.begin() as conn:
-                result = conn.execute( new_entry ).inserted_primary_key or ''
-                result = conn.execute( sa.select( model ).where( model.id == str( result ) ) ).fetchone()
+            with Session( self.__engine ) as conn:
+                conn.add( new_entry )
+                conn.commit()
+                
+                result = conn.execute( sa.select( model ).where( model.id == str( uid ) ) ).fetchone()
                 result = result._asdict() if result else None
 
         except Exception as e:
             print( f'Error occurred while creating entry: {e}' )
             return None
 
+        print(result)
         return result

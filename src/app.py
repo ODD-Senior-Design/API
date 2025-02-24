@@ -3,10 +3,10 @@ from random import randint
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, abort
 from flask_cors import CORS
-from marshmallow import ValidationError
+from marshmallow import EXCLUDE, ValidationError
 from uuid import UUID
+from datetime import datetime
 
-from numpy import imag
 from db_handler import DBhandler
 from webhook_handler import CameraInterface, AIInterface
 from sample_data_generator import DataGenerator
@@ -71,21 +71,35 @@ def take_image() -> Response:
 def assess_image() -> Response:
     image_data: dict = request.get_json()
     schema = AssessmentsSchema()
+
     try:
         image_data = schema.load( image_data )
     except ValidationError as e:
         abort( 400, e.messages )
 
-    assessment_data = ai.analyze_image( image_data )
+    assessment_data = ai.analyze_image( image_data ) or { 'assessment': True, 'assessment_timestamp': datetime.now() }
 
     if assessment_data is None:
         abort( 500, 'Failed to analyze image' )
 
     assessment_data.update( image_data )
-    assessment_metadata = db.create_entry( data=assessment_data, table_name='assessments' )
+    assessment_data.update( { 'id': 'a6158250-f9cb-1f87-b5bc-a40d93d9d15b' } ) #! TEMPORARY! FOR TESTING ONLY
+    assessment_metadata = assessment_data #db.create_entry( data=assessment_data, table_name='assessments' )
 
     if assessment_metadata is None:
-        abort( 500, 'Failed to insert new image entry' )
+        abort( 500, 'Failed to insert new assessment entry' )
+
+    image_data = db.get_entry_from_id( uuid=image_data.get( 'image_id', '' ), table_name='images' ) or {}
+
+    if image_data == {}:
+        abort( 500, 'Failed to retrieve image data' )
+
+    image_data.update( { 'image_set': { 'id': image_data[ 'set_id' ], 'patient_id': image_data[ 'patient_id' ], 'patient': {} } } )
+    image_data[ 'image_set' ].update( { 'patient': db.get_entry_from_id( uuid=image_data.get( 'patient_id', '' ), table_name='patients' ) or {} } )
+
+    image_schema = ImagesSchema()
+
+    assessment_metadata['image'] = image_schema.dump( image_data )
 
     return jsonify( schema.dump( assessment_data ) )
 
