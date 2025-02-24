@@ -16,7 +16,7 @@ class ImageSetsSchema( SQLAlchemyAutoSchema ):
         include_relationships = True
 
     id = auto_field( dump_only=True )
-    patient_id = auto_field( dump_only=True )
+    patient = auto_field( dump_only=True )
 
 class ImagesSchema( SQLAlchemyAutoSchema ):
     class Meta:
@@ -26,8 +26,8 @@ class ImagesSchema( SQLAlchemyAutoSchema ):
         include_relationships = True
 
     id = auto_field( dump_only=True )
-    set_id = auto_field( dump_only=True )
-    patient_id = auto_field( dump_only=True )
+    image_timestamp = auto_field( dump_only=True )
+    set = auto_field( dump_only=True )
 
 class AssessmentsSchema( SQLAlchemyAutoSchema ):
     class Meta:
@@ -37,6 +37,6 @@ class AssessmentsSchema( SQLAlchemyAutoSchema ):
         include_relationships = True
 
     id = auto_field( dump_only=True )
-    image_id = auto_field( dump_only=True )
-    set_id = auto_field( dump_only=True )
-    patient_id = auto_field( dump_only=True )
+    assessment = auto_field( dump_only=True )
+    assessment_timestamp = auto_field( dump_only=True )
+    image = auto_field( dump_only=True )

@@ -5,8 +5,10 @@ from flask import Flask, Response, request, jsonify, abort
 from flask_cors import CORS
 from marshmallow import ValidationError
 from uuid import UUID
+
+from numpy import imag
 from db_handler import DBhandler
-from webhook_handler import CameraInterface
+from webhook_handler import CameraInterface, AIInterface
 from sample_data_generator import DataGenerator
 from schemas import PatientsSchema, ImageSetsSchema, ImagesSchema, AssessmentsSchema
 
@@ -19,29 +21,26 @@ schema_folder_path: str = getenv( "JSON_SCHEMA_FOLDER_PATH" ) or './src/sample-d
 max_samples: int = int( getenv( "MAX_SAMPLES" )  or '5')
 db = DBhandler( getenv( "DB_URI" ) or '', debug=debug_mode )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
+ai = AIInterface( getenv( "AI_INTERFACE_URL" ) or '', debug=debug_mode )
 
 @app.route( '/images', methods=['GET'] )
 def get_latest_image() -> Response:
-    image_entries = db.get_top_entry( table_name='images', order='image_timestamp' )
+    image = db.get_top_entry( table_name='images', order='image_timestamp' )
 
-    if image_entries is None:
+    if image is None:
         abort( 404, 'No images saved' )
 
     schema = ImagesSchema()
 
-    return jsonify( schema.dump( image_entries ) )
+    return jsonify( schema.dump( image ) )
 
 @app.route( '/images/<uuid:uid>', methods=['GET'] )
 def get_image_from_uuid( uid: UUID ) -> Response:
-    image = db.get_entries_from_id( uuid=uid, table_name='images' )
+    image = db.get_entry_from_id( uuid=uid, table_name='images' )
 
     if image is None:
         abort( 404, 'No images with that UUID' )
 
-    if len( image ) > 1:
-        abort( 500, 'Duplicate uuids found' )
-
-    image = image.pop()
     schema = ImagesSchema()
 
     return jsonify( schema.dump( image ) )
@@ -61,12 +60,34 @@ def take_image() -> Response:
     if image_data is None:
         abort( 500, 'Failed to capture image' )
 
-    image_id = db.create_entry( data=image_data, table_name='images' )
+    image_metadata = db.create_entry( data=image_data, table_name='images' )
 
-    if image_id is None:
-        abort( 500, 'No id recieved for new image' )
+    if image_metadata is None:
+        abort( 500, 'Failed to insert new image entry' )
 
-    return jsonify( { "id": image_id } )
+    return jsonify( image_metadata )
+
+@app.route( '/assessments', methods=['POST'] )
+def assess_image() -> Response:
+    image_data: dict = request.get_json()
+    schema = AssessmentsSchema()
+    try:
+        image_data = schema.load( image_data )
+    except ValidationError as e:
+        abort( 400, e.messages )
+
+    assessment_data = ai.analyze_image( image_data )
+
+    if assessment_data is None:
+        abort( 500, 'Failed to analyze image' )
+
+    assessment_data.update( image_data )
+    assessment_metadata = db.create_entry( data=assessment_data, table_name='assessments' )
+
+    if assessment_metadata is None:
+        abort( 500, 'Failed to insert new image entry' )
+
+    return jsonify( schema.dump( assessment_data ) )
 
 @app.route( '/generate', methods=['GET'] )
 def generate__all_sample_data() -> Response:

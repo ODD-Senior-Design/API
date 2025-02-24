@@ -6,8 +6,8 @@ from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
 class DBhandler():
 
     def __init__( self, db_uri: str, debug: bool ):
-
         self.__engine: sa.Engine = sa.create_engine( db_uri, echo=debug )
+
     def __get_model_from_table_name( self, table_name: str ) -> Optional[ Any ]:
         return {
             'patients': PatientsModel,
@@ -23,27 +23,36 @@ class DBhandler():
         if model is None:
             return None
 
-
         query = sa.select( model ).order_by( sa.desc( order ) )
 
-        with self.__engine.begin() as conn:
-            result = conn.execute( query ).fetchone()
-            result = result._asdict() if result else None
+        try:
+            with self.__engine.begin() as conn:
+                result = conn.execute( query ).fetchone()
+                result = result._asdict() if result else None
 
+        except Exception as e:
+            print( f'Error occurred while fetching top entry: { e }' )
+            return None
+    
         return result
 
-    def get_entries_from_id( self, uuid: UUID, table_name: str ) -> Optional[ List[ Dict[ str, Any ] ] ]:
+    def get_entry_from_id( self, uuid: UUID, table_name: str ) -> Optional[ Dict[ str, Any ] ]:
 
         model = self.__get_model_from_table_name( table_name )
 
         if model is None:
             return None
 
-        query = sa.select( model ).where( model.id == str(uuid) )
+        query = sa.select( model ).where( model.id == str( uuid ) )
 
-        with self.__engine.begin() as conn:
-            result = conn.execute( query ).fetchall()
-            result = list( map( lambda r: r._asdict(), result ) ) # Dict expansion to convert the `Row` type to a `Dict` type
+        try:
+            with self.__engine.begin() as conn:
+                result = conn.execute( query ).fetchone()
+                result = result._asdict() if result else None
+
+        except Exception as e:
+            print( f'Error occurred while fetching entry by ID: { e }' )
+            return None
 
         return result
 
@@ -56,9 +65,14 @@ class DBhandler():
 
         new_entry = model( **data )
 
-        with self.__engine.begin() as conn:
-            result = conn.execute( new_entry ).inserted_primary_key or []
-            result = conn.execute( sa.select( model ).where( model.id == str( result ) ) ).fetchone()
-            result = result._asdict() if result else None
+        try:
+            with self.__engine.begin() as conn:
+                result = conn.execute( new_entry ).inserted_primary_key or ''
+                result = conn.execute( sa.select( model ).where( model.id == str( result ) ) ).fetchone()
+                result = result._asdict() if result else None
+
+        except Exception as e:
+            print( f'Error occurred while creating entry: {e}' )
+            return None
 
         return result
