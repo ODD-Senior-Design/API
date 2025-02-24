@@ -11,7 +11,7 @@ from datetime import datetime
 from db_handler import DBhandler
 from webhook_handler import CameraInterface, AIInterface
 from sample_data_generator import DataGenerator
-from schemas import PatientsSchema, ImageSetsSchema, ImagesSchema, AssessmentsSchema
+from schemas import PatientsSchema, ImagesSchema, AssessmentsSchema
 
 app: Flask = Flask( getenv( "APP_NAME" ) or 'API' )
 cors: CORS = CORS( app )
@@ -24,28 +24,6 @@ datetime_format: str = getenv( "DATETIME_FORMAT" ) or '%Y-%m-%dT%H:%M:%S'
 db = DBhandler( getenv( "DB_URI" ) or '', debug=debug_mode )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 ai = AIInterface( getenv( "AI_INTERFACE_URL" ) or '', debug=debug_mode )
-
-@app.route( '/images', methods=['GET'] )
-def get_latest_image() -> Response:
-    image = db.get_top_entry( table_name='images', order='image_timestamp' )
-
-    if image is None:
-        abort( 404, 'No images saved' )
-
-    schema = ImagesSchema()
-
-    return jsonify( schema.dump( image ) )
-
-@app.route( '/images/<uuid:uid>', methods=['GET'] )
-def get_image_from_uuid( uid: UUID ) -> Response:
-    image = db.get_entry_from_id( uuid=uid, table_name='images' )
-
-    if image is None:
-        abort( 404, 'No images with that UUID' )
-
-    schema = ImagesSchema()
-
-    return jsonify( schema.dump( image ) )
 
 @app.route( '/images', methods=['POST'] )
 def take_image() -> Response:
@@ -71,6 +49,28 @@ def take_image() -> Response:
 
     return jsonify( schema.dump( image_metadata ) )
 
+@app.route( '/images', methods=['GET'] )
+def get_latest_image() -> Response:
+    image = db.get_top_entry( table_name='images', order='image_timestamp' )
+
+    if image is None:
+        abort( 404, 'No images saved' )
+
+    schema = ImagesSchema()
+
+    return jsonify( schema.dump( image ) )
+
+@app.route( '/images/<uuid:uid>', methods=['GET'] )
+def get_image_from_uuid( uid: UUID ) -> Response:
+    image = db.get_entry_from_id( uuid=uid, table_name='images' )
+
+    if image is None:
+        abort( 404, 'No images with that UUID' )
+
+    schema = ImagesSchema()
+
+    return jsonify( schema.dump( image ) )
+
 @app.route( '/assessments', methods=['POST'] )
 def assess_image() -> Response:
     ids: dict[str, Any] = request.get_json()
@@ -94,6 +94,28 @@ def assess_image() -> Response:
         abort( 500, 'Failed to insert new assessment entry' )
 
     return jsonify( schema.dump( assessment_data ) )
+
+@app.route( '/assessments', methods=['GET'] )
+def get_latest_assessment() -> Response:
+    image = db.get_top_entry( table_name='assessments', order='assessment_timestamp' )
+
+    if image is None:
+        abort( 404, 'No assessments saved' )
+
+    schema = AssessmentsSchema()
+
+    return jsonify( schema.dump( image ) )
+
+@app.route( '/assessments/<uuid:uid>', methods=['GET'] )
+def get_assessment_from_uuid( uid: UUID ) -> Response:
+    image = db.get_entry_from_id( uuid=uid, table_name='assessments' )
+
+    if image is None:
+        abort( 404, 'No assessments with that UUID' )
+
+    schema = AssessmentsSchema()
+
+    return jsonify( schema.dump( image ) )
 
 @app.route( '/generate', methods=['GET'] )
 def generate__all_sample_data() -> Response:
