@@ -1,5 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy import desc
+from sqlalchemy.orm import Session
+import secrets
 from uuid import UUID
 from typing import Optional, List, Dict, Any
 from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
@@ -7,8 +8,8 @@ from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
 class DBhandler():
 
     def __init__( self, db_uri: str, debug: bool ):
-
         self.__engine: sa.Engine = sa.create_engine( db_uri, echo=debug )
+
     def __get_model_from_table_name( self, table_name: str ) -> Optional[ Any ]:
         return {
             'patients': PatientsModel,
@@ -24,31 +25,41 @@ class DBhandler():
         if model is None:
             return None
 
+        query = sa.select( model ).order_by( sa.desc( order ) )
 
-        query = sa.select( model ).order_by( desc( order ) )
+        try:
+            with self.__engine.begin() as conn:
+                result = conn.execute( query ).fetchone()
+                result = result._asdict() if result else None
 
-        with self.__engine.begin() as conn:
-            result = conn.execute( query ).fetchone()
-            result = result._asdict() if result else None
+        except Exception as e:
+            print( f'Error occurred while fetching top entry: { e }' )
+            return None
 
         return result
 
-    def get_entries_from_id( self, uuid: UUID, table_name: str ) -> Optional[ List[ Dict[ str, Any ] ] ]:
+    def get_entry_from_id( self, uuid: UUID, table_name: str ) -> Optional[ Dict[ str, Any ] ]:
 
         model = self.__get_model_from_table_name( table_name )
 
         if model is None:
             return None
 
-        query = sa.select( model ).where( model.id == str(uuid) )
+        query = sa.select( model ).where( model.id == str( uuid ) )
 
-        with self.__engine.begin() as conn:
-            result = conn.execute( query ).fetchall()
-            result = list( map( lambda r: r._asdict(), result ) ) # Dict expansion to convert the `Row` type to a `Dict` type
+        try:
+            with self.__engine.begin() as conn:
+                result = conn.execute( query ).fetchone()
+                result = result._asdict() if result else None
+                
+        except Exception as e:
+            print( f'Error occurred while fetching entry by ID: { e }' )
+            return None
 
-        return result or None
+        print(result)
+        return result
 
-    def create_entry( self, data: dict, table_name: str ) -> Optional[ str ]:
+    def create_entry( self, data: dict, table_name: str ) -> Optional[ Dict[ str, Any ] ]:
 
         model = self.__get_model_from_table_name( table_name )
 
@@ -56,8 +67,23 @@ class DBhandler():
             return None
 
         new_entry = model( **data )
+        uid = UUID( hex=secrets.token_hex( 16 ) )
 
-        with self.__engine.begin() as conn:
-            result = conn.execute( new_entry ).inserted_primary_key or []
+        while self.get_entry_from_id( uid, table_name=table_name ) is not None:
+            uid = UUID( hex=secrets.token_hex( 16 ) )
 
-        return result[0] or None
+        new_entry.id = str( uid )
+
+        try:
+            with Session( self.__engine ) as conn:
+                conn.add( new_entry )
+                conn.commit()
+                result = conn.execute( sa.select( model ).where( model.id == str( uid ) ) ).fetchone()
+                result = result._asdict() if result else None
+
+        except Exception as e:
+            print( f'Error occurred while creating entry: {e}' )
+            return None
+
+        print(result)
+        return result
