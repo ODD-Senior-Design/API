@@ -18,6 +18,26 @@ class DBhandler():
             'assessments': AssessmentsModel
         }.get( table_name )
 
+    def get_all_entries( self, table_name: str ) -> Optional[ List[ Dict[ str, Any ] ] ]:
+        
+        model = self.__get_model_from_table_name( table_name )
+
+        if model is None:
+            return None
+
+        query = sa.select( model )
+
+        try:
+            with self.__engine.begin() as conn:
+                result = conn.execute( query ).fetchall()
+                result = [ r._asdict() for r in result ]
+
+        except Exception as e:
+            print( f'Error occurred while fetching all entries: { e }' )
+            return None
+
+        return result
+
     def get_top_entry( self, table_name: str, order='id' ) -> Optional[ Dict[ str, Any ] ]:
 
         model = self.__get_model_from_table_name( table_name )
@@ -51,7 +71,7 @@ class DBhandler():
             with self.__engine.begin() as conn:
                 result = conn.execute( query ).fetchone()
                 result = result._asdict() if result else None
-                
+
         except Exception as e:
             print( f'Error occurred while fetching entry by ID: { e }' )
             return None
@@ -69,9 +89,6 @@ class DBhandler():
         new_entry = model( **data )
         uid = UUID( hex=secrets.token_hex( 16 ) )
 
-        while self.get_entry_from_id( uid, table_name=table_name ) is not None:
-            uid = UUID( hex=secrets.token_hex( 16 ) )
-
         new_entry.id = str( uid )
 
         try:
@@ -86,4 +103,23 @@ class DBhandler():
             return None
 
         print(result)
+        return result
+
+    def get_linked_entries_from_patient_id( self, patient_id: UUID, table_name: str ) -> Optional[ List[ Dict[ str, Any ] ] ]:
+        model = self.__get_model_from_table_name( table_name )
+
+        if model is None:
+            return None
+
+        query = sa.select( model ).where( model.patient_id == str( patient_id ) ).join()
+
+        try:
+            with self.__engine.begin() as conn:
+                result = conn.execute( query ).fetchall()
+                result = [ row._asdict() for row in result ]
+
+        except Exception as e:
+            print( f'Error occurred while fetching linked entries: { e }' )
+            return None
+
         return result

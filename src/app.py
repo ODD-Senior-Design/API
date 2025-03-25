@@ -25,6 +25,20 @@ db = DBhandler( getenv( "DB_URI" ) or '', debug=debug_mode )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL" ) or '', debug=debug_mode )
 ai = AIInterface( getenv( "AI_INTERFACE_URL" ) or '', debug=debug_mode )
 
+@app.route( '/patients', methods=['GET'] )
+def get_all_patients() -> Response:
+    patients = db.get_all_entries( table_name='patients' )
+    if patients is None:
+        abort( 404, 'No patients found' )
+    
+    schema = PatientsSchema( many=True )
+    
+    return jsonify( schema.dump( patients ) )
+
+@app.route( '/patients', methods=['POST'] )
+def add_patient() -> Response:
+    pass
+
 @app.route( '/images', methods=['POST'] )
 def take_image() -> Response:
     patient_data: dict = request.get_json()
