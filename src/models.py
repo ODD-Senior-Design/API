@@ -4,7 +4,6 @@ from sqlalchemy import ForeignKey, String as id_type
 from sqlalchemy.orm import (
 
     DeclarativeBase,
-    backref,
     relationship,
     mapped_column,
     Mapped

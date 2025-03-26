@@ -13,13 +13,23 @@ class CameraInterface():
         default_header = { 'Content-type': 'application/json' }
 
         try:
-            resp = req.post( url=self.__url, headers=headers or default_header, json=payload, timeout=self.__timeout )
+            resp = req.post( url=f'{ self.__url }/capture', headers=headers or default_header, json=payload, timeout=self.__timeout )
 
         except req.exceptions.RequestException as e:
             if self.__debug: print( f'Error occurred while capturing image:\n\n{ e }\n\n' )
             return None
 
         return resp.json()
+    
+    def get_stream_url( self ) -> Optional[ str ]:
+        try:
+            resp = req.get( url=f'{ self.__url }/stream', timeout=self.__timeout )
+
+        except req.exceptions.RequestException as e:
+            if self.__debug: print( f'Error occurred while getting stream URL:\n\n{ e }\n\n' )
+            return None
+
+        return resp.json().get( 'stream_url' )
 
 class AIInterface():
 
