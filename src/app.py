@@ -1,11 +1,12 @@
 from os import getenv
 from random import randint
-from typing import Any
+from typing import Any, Dict
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, abort
 from flask_cors import CORS
-from marshmallow import ValidationError
+from marshmallow import INCLUDE, ValidationError
 from uuid import UUID
+from secrets import token_hex
 
 from db_handler import DBhandler
 from webhook_handler import CameraInterface, AnalyzerInterface
@@ -17,11 +18,12 @@ cors: CORS = CORS( app )
 debug_mode: bool = getenv( "DEBUG_MODE", "0" ) == '1'
 host_address: str = getenv( "HOST_ADDRESS", "0.0.0.0" )
 bind_port: int = int( getenv( "BIND_PORT", "5000" ) )
+datetime_format: str = getenv( "DATETIME_FORMAT", "%Y-%m-%dT%H:%M:%S" )
 
 schema_folder_path: str = getenv( "JSON_SCHEMA_FOLDER_PATH", "./src/sample-data-schemas" )
 max_samples: int = int( getenv( "MAX_SAMPLES", "5" ) )
 
-db = DBhandler( getenv( "DB_URI", "" ), debug=debug_mode )
+db = DBhandler( getenv( "DB_URI", "" ), debug=debug_mode, datetime_format=datetime_format )
 ci = CameraInterface( getenv( "CAMERA_INTERFACE_URL", "" ), debug=debug_mode )
 ai = AnalyzerInterface( getenv( "AI_INTERFACE_URL", "" ), debug=debug_mode )
 
@@ -185,20 +187,28 @@ def take_image() -> Response:
     Returns:
         Response: A JSON response containing the metadata of the newly captured image.
     """
-    patient_data: dict = request.get_json()
+    ids: dict = request.get_json()
 
     try:
-        schema = PatientsSchema()
-        patient_data = schema.load( patient_data )
+        schema = AssessmentsSchema(   )
+        ids = schema.load( ids, partial=( 'id', 'image_id'  ) )
     except ValidationError as e:
         abort( 400, e.messages )
 
-    image_data = ci.capture_image( payload=patient_data )
+    image_id = UUID( hex=token_hex( 16 ) )
+
+    ids.update( { 'image_id': str( image_id ) } )
+
+    image_data = ci.capture_image( payload=ids )
 
     if image_data is None:
         abort( 500, 'Failed to capture image' )
 
-    image_data.update( patient_data )
+    image_b64_str = image_data.pop( 'image_b64' )
+    image_id = ids.pop( 'image_id' )
+    ids.update( { 'id': image_id } )
+
+    image_data.update( ids )
 
     image_metadata = db.create_entry( data=image_data, table_name='images' )
 
@@ -207,7 +217,9 @@ def take_image() -> Response:
 
     schema = ImagesSchema()
 
-    return jsonify( schema.dump( image_metadata ) )
+    response_dict: Dict = schema.dump( image_metadata )
+    response_dict.update( { 'image_b64': image_b64_str } )
+    return jsonify( response_dict )
 
 @app.route( '/assessments', methods=['POST'] )
 def assess_image() -> Response:

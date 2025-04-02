@@ -1,3 +1,5 @@
+import contextlib
+from datetime import datetime
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 import secrets
@@ -8,7 +10,7 @@ from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
 class DBhandler:
     """Handles database interactions for various models."""
 
-    def __init__( self, db_uri: str, debug: bool ):
+    def __init__( self, db_uri: str, debug: bool, datetime_format: str ):
         """Initializes the database handler.
 
         Args:
@@ -16,6 +18,7 @@ class DBhandler:
             debug ( bool ): Whether to enable debug mode for the database engine.
         """
         self.__engine: sa.Engine = sa.create_engine( db_uri, echo=debug )
+        self.__datetime_format = datetime_format
 
     def get_model_from_table_name( self, table_name: str ) -> Optional[Any]:
         """Retrieves the SQLAlchemy model associated with a given table name.
@@ -137,16 +140,21 @@ class DBhandler:
             return None
 
         new_entry = model( **data )
-        uid = UUID( hex=secrets.token_hex( 16 ) )
+        if not new_entry.id:
+            uid = UUID( hex=secrets.token_hex( 16 ) )
 
-        new_entry.id = str( uid )
+            new_entry.id = str( uid )
+
+        with contextlib.suppress(AttributeError):
+            new_entry.image_timestamp = datetime.strptime( new_entry.image_timestamp, self.__datetime_format )
+            new_entry.assessment_timestamp = datetime.strptime( new_entry.assessment_timestamp, self.__datetime_format )
 
         try:
             with Session( self.__engine ) as conn:
                 conn.add( new_entry )
                 conn.commit()
-                result = conn.execute( sa.select( model ).where( model.id == str( uid ) ) ).fetchone()
-                result = result._asdict() if result else None
+                result = conn.execute( sa.select( model ).where( model.id == str( new_entry.id ) ) ).fetchone()
+                result = [{column.name: getattr(row, column.name) for column in model.__table__.columns} for row in result][0] if result else None
 
         except Exception as e:
             print( f'Error occurred while creating entry: {e}' )

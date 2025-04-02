@@ -1,4 +1,4 @@
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, SQLAlchemySchema, auto_field
 from marshmallow_sqlalchemy.fields import Related
 from models import PatientsModel, ImageSetsModel, ImagesModel, AssessmentsModel
 
@@ -33,22 +33,25 @@ class ImageSetsSchema( SQLAlchemyAutoSchema ):
     id = auto_field( dump_only=True )
     patient = Related()
 
-class ImagesSchema( SQLAlchemyAutoSchema ):
+class ImagesSchema( SQLAlchemySchema ):
     """
     Schema for the ImagesModel.
 
     Handles serialization and deserialization of image data, including relationships
     with image sets.
     """
-    class Meta:
+    class Meta():
         model = ImagesModel
-        load_instance = False
-        include_fk = True
-        include_relationships = True
+        load_instance = True
+        # include_fk = True
+        # include_relationships = True
+        fields = ( 'id', 'patient_id', 'image_timestamp', 'set_id','uri' )
 
-    id = auto_field( dump_only=True )
-    image_timestamp = auto_field( dump_only=True )
-    image_set = auto_field( dump_only=True )
+    id = auto_field()
+    patient_id = auto_field( required=True )
+    image_timestamp = auto_field( required=True )
+    set_id = auto_field( required=True )
+    uri = auto_field( required=True )
 
 class AssessmentsSchema( SQLAlchemyAutoSchema ):
     """
