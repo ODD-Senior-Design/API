@@ -1,27 +1,39 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "properties": {
-        "id": {
-            "title": "id",
-            "type": "string",
-            "format": "uuid",
-            "readOnly": true
-        },
-        "first_name": {
-            "title": "first_name",
-            "type": "string",
-            "$provider": "faker.first_name"
-        },
-        "last_name": {
-            "title": "last_name",
-            "type": "string",
-            "$provider": "faker.last_name"
+    "definitions": {
+        "PatientsSchema": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "first_name": {
+                    "title": "first_name",
+                    "type": "string",
+                    "$provider": "faker.first_name"
+                },
+                "last_name": {
+                    "title": "last_name",
+                    "type": "string",
+                    "$provider": "faker.last_name"
+                },
+                "dob": {
+                    "title": "dob",
+                    "type": "string",
+                    "format": "date",
+                    "$provider": "faker.date"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "first_name",
+                "last_name",
+                "dob"
+            ],
+            "additionalProperties": false
         }
-    },
-    "required": [
-        "id",
-        "first_name",
-        "last_name"
-    ]
+    }
 }

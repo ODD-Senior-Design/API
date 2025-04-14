@@ -18,13 +18,20 @@
                     "title": "last_name",
                     "type": "string",
                     "$provider": "faker.last_name"
+                },
+                "dob": {
+                    "title": "dob",
+                    "type": "string",
+                    "format": "date",
+                    "$provider": "faker.date"
                 }
             },
             "type": "object",
             "required": [
                 "id",
                 "first_name",
-                "last_name"
+                "last_name",
+                "dob"
             ],
             "additionalProperties": false
         },

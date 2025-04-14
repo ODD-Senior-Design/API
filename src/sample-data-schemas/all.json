@@ -18,14 +18,22 @@
                     "title": "last_name",
                     "type": "string",
                     "$provider": "faker.last_name"
+                },
+                "dob": {
+                    "title": "dob",
+                    "type": "string",
+                    "format": "date",
+                    "$provider": "faker.date"
                 }
             },
             "type": "object",
             "required": [
                 "id",
                 "first_name",
-                "last_name"
-            ]
+                "last_name",
+                "dob"
+            ],
+            "additionalProperties": false
         },
         "ImageSetsSchema": {
             "properties": {
@@ -49,7 +57,8 @@
                 "id",
                 "patient_id",
                 "patient"
-                ]
+                ],
+            "additionalProperties": false
         },
         "ImagesSchema": {
             "properties": {
@@ -91,7 +100,8 @@
                 "image_set",
                 "image_timestamp",
                 "uri"
-            ]
+            ],
+            "additionalProperties": false
         },
         "AssessmentsSchema": {
             "properties": {
@@ -139,7 +149,8 @@
                 "image",
                 "assessment_timestamp",
                 "assessment"
-            ]
+            ],
+            "additionalProperties": false
         }
     },
     "type": "object",
@@ -182,5 +193,6 @@
         "image_sets",
         "images",
         "assessments"
-    ]
+    ],
+    "additionalProperties": false
 }

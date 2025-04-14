@@ -3,10 +3,10 @@ CREATE TABLE patients (
 
     id TEXT NOT NULL PRIMARY KEY,
     first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL
+    last_name TEXT NOT NULL,
+    dob TEXT NOT NULL
 
 );
-
 
 DROP TABLE IF EXISTS image_sets;
 CREATE TABLE image_sets (

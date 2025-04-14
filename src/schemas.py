@@ -17,6 +17,7 @@ class PatientsSchema( SQLAlchemyAutoSchema ):
         load_instance = False
 
     id = auto_field( dump_only=True )
+
 class ImageSetsSchema( SQLAlchemyAutoSchema ):
     """
     Schema for the ImageSetsModel.

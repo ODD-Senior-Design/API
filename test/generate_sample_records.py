@@ -12,7 +12,7 @@ from models import PatientsModel, ImagesModel, ImageSetsModel, AssessmentsModel
 
 fake_data_SCHEMA_JSON_PATH = './test/sample_schema.json'
 fake_data_JSON_SAVE_PATH = './test/fake_data.json'
-TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S+00:00'
+TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f+00:00'
 STORE_TO_DB = True
 OVERRIDE_DB = True
 

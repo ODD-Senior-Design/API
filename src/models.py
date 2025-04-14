@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 from sqlalchemy import ForeignKey, String as id_type
-from sqlalchemy.orm import ( 
+from sqlalchemy.orm import (
 
     DeclarativeBase,
     relationship,
@@ -38,6 +38,7 @@ class PatientsModel( _Base ):
     id: Mapped[ UUID ] = mapped_column( id_type, primary_key=True )
     first_name: Mapped[ str ] = mapped_column( nullable=False )
     last_name: Mapped[ str ] = mapped_column( nullable=False )
+    dob: Mapped[ str ] = mapped_column( nullable=False )
 
 class ImageSetsModel( _Base ):
     """Represents a set of images associated with a patient.

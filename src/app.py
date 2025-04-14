@@ -4,7 +4,7 @@ from typing import Any, Dict
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, abort
 from flask_cors import CORS
-from marshmallow import INCLUDE, ValidationError
+from marshmallow import ValidationError
 from uuid import UUID
 from secrets import token_hex
 
