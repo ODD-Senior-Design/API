@@ -14,6 +14,8 @@ python-dotenv = "*"
 jsf = "*"
 gunicorn = "*"
 flask-cors = "*"
+eventlet = "*"
+gunicorn-color = "*"
 
 [dev-packages]
 

@@ -175,4 +175,3 @@ class DBhandler:
             Optional[List[Dict[str, Any]]]: A list of dictionaries representing the linked entries, or None if an error occurs.
         """
         pass
-

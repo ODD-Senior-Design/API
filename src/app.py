@@ -16,7 +16,7 @@ from schemas import ImageSetsSchema, PatientsSchema, ImagesSchema, AssessmentsSc
 app: Flask = Flask( getenv( "APP_NAME", "API" ) )
 cors: CORS = CORS( app )
 debug_mode: bool = getenv( "DEBUG_MODE", "0" ) == '1'
-host_address: str = getenv( "HOST_ADDRESS", "0.0.0.0" )
+bind_address: str = getenv( "BIND_ADDRESS", "0.0.0.0" )
 bind_port: int = int( getenv( "BIND_PORT", "5000" ) )
 datetime_format: str = getenv( "DATETIME_FORMAT", "%Y-%m-%dT%H:%M:%S" )
 
@@ -376,7 +376,7 @@ def start_app():
     print( 'Loading .env file if present...' )
     load_dotenv()
     print( 'Starting API...' )
-    app.run( debug=debug_mode, host=host_address, port=bind_port )
+    app.run( debug=debug_mode, host=bind_address, port=bind_port )
 
 if __name__ == '__main__':
     start_app()
