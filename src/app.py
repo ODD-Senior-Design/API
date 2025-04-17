@@ -285,7 +285,7 @@ def get_table_entries( table_name: str ) -> Response:
 
     return jsonify( schema.dump( entries ) )
 
-@app.route( '/<table_name>/<uuid:uid>', methods=['GET'] )
+@app.route( '/<table_name>/<uuid:uid>', methods=['GET', 'DELETE'] )
 def get_table_entry_from_id( table_name: str, uid: UUID ) -> Response:
     """Get an entry from a table by ID.
 
@@ -304,7 +304,11 @@ def get_table_entry_from_id( table_name: str, uid: UUID ) -> Response:
     if table_model is None:
         abort( 404, f"Table '{ table_name }' does not exist." )
 
-    entry = db.get_entry_from_id( uuid=uid, table_name=table_name )
+    if request.method == 'DELETE':
+        entry = db.delete_entry_from_id( uuid=uid, table_name=table_name )
+
+    else:
+        entry = db.get_entry_from_id( uuid=uid, table_name=table_name )
 
     if entry is None:
         abort( 404, f"'No { table_name } with that UUID" )

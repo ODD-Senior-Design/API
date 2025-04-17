@@ -160,8 +160,36 @@ class DBhandler:
             print( f'Error occurred while creating entry: {e}' )
             return None
 
-        print( result )
+        print( f'Created entry:\n{ result }' )
         return result
+
+    def delete_entry_from_id( self, uuid: UUID, table_name: str ) -> Optional[ Dict[str, Any] ]:
+        """Deletes an entry from a given table based on its UUID.
+
+        Args:
+            uuid ( UUID ): The UUID of the entry to delete.
+            table_name ( str ): The name of the table.
+
+        Returns:
+            Optional[Dict[str, Any]]: A dictionary representing the deleted entry, or None if an error occurs or no entry is found.
+        """
+        model = self.get_model_from_table_name( table_name )
+
+        if model is None:
+            return None
+
+        try:
+            with Session( self.__engine ) as conn:
+                result = conn.execute( sa.delete( model ).where( model.id == str( uuid ) ).returning(*model.__table__.columns) ).fetchone()
+                conn.commit()
+                result = {column.name: getattr(result, column.name) for column in model.__table__.columns} if result else None
+        except Exception as e:
+            print(f'Error occurred while deleting entry: {e}')
+            return None
+
+        print( f'Deleted entry:\n{ result }' )
+        return result
+
 
     # TODO: Implement function to get all data linked to a specific patient ID
     def get_all_data_from_patient_id( self, patient_id: UUID, table_name: str ) -> Optional[Dict[str, Any]]:
