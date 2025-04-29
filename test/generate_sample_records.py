@@ -2,45 +2,55 @@ from datetime import datetime
 from os import getenv
 from dotenv import load_dotenv
 from jsf import JSF
+from faker import Faker
 from typing import Dict, Any
 import json
+import random
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 import sys
 sys.path.insert(0, r'./src/')
 from models import PatientsModel, ImagesModel, ImageSetsModel, AssessmentsModel
 
-fake_data_SCHEMA_JSON_PATH = './test/sample_schema.json'
-fake_data_JSON_SAVE_PATH = './test/fake_data.json'
+FAKE_DATA_SCHEMA_JSON_PATH = './src/sample-data-schemas/all.json'
+FAKE_DATA_JSON_SAVE_PATH = './test/fake_data.json'
 TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f+00:00'
 STORE_TO_DB = True
 OVERRIDE_DB = True
 
-with open(fake_data_SCHEMA_JSON_PATH, 'r') as f:
+with open(FAKE_DATA_SCHEMA_JSON_PATH, 'r') as f:
     print( json.load( f ) )
 
-jsf = JSF.from_json( fake_data_SCHEMA_JSON_PATH )
+jsf = JSF.from_json( FAKE_DATA_SCHEMA_JSON_PATH )
 fake_data = jsf.generate()
 print('\n')
 print( fake_data )
 
-# Replace sub-oobject ids with super objects id
 
-# Replace image_sets.patient.id with image_sets.patient_id
+def fix_sex_field(patients: dict) -> Dict[ str, Any ]:
+    patients["sex"] = random.choice(["Male", "Female"])
+    return patients.copy()
+
+fake_data[ 'patients' ] = [ fix_sex_field( p ) for p in fake_data[ 'patients' ] ]
+
 def fix_inconsistencies( data: dict ) -> Dict[ str, Any ]:
+
+    faker = Faker()
 
     if data.get( 'image_id' ):
         data[ 'image' ].update( { 'id': data[ 'image_id' ], 'set_id': data[ 'set_id' ], 'patient_id': data[ 'patient_id' ] } )
         data[ 'image' ][ 'image_set' ].update( { 'id': data[ 'set_id' ], 'patient_id': data[ 'patient_id' ] } )
         data[ 'image' ][ 'image_set' ][ 'patient' ][ 'id' ] = data[ 'patient_id' ]
+        data[ 'image' ][ 'image_set' ][ 'patient' ][ 'first_name' ] =  faker.first_name_male() if data[ 'image' ][ 'image_set' ][ 'patient' ][ 'sex' ] == "Male" else faker.first_name_female()
 
     elif data.get( 'set_id' ):
         data[ 'image_set' ].update( { 'id': data[ 'set_id' ], 'patient_id': data[ 'patient_id' ] } )
         data[ 'image_set' ][ 'patient' ][ 'id' ] = data[ 'patient_id' ]
+        data[ 'image_set' ][ 'patient' ][ 'first_name' ] =  faker.first_name_male() if data[ 'image_set' ][ 'patient' ][ 'sex' ] == "Male" else faker.first_name_female()
 
     elif data.get( 'patient_id' ):
         data[ 'patient' ][ 'id' ] = data[ 'patient_id' ]
-
+        data[ 'patient' ][ 'first_name' ] =  faker.first_name_male() if data[ 'patient' ][ 'sex' ] == "Male" else faker.first_name_female()
 
 
     return data.copy()
@@ -52,7 +62,7 @@ fake_data[ 'patients' ] = [ fix_inconsistencies( p ) for p in fake_data[ 'patien
 
 print('\n')
 
-with open( fake_data_JSON_SAVE_PATH, 'w', encoding='utf-8' ) as f:
+with open( FAKE_DATA_JSON_SAVE_PATH, 'w', encoding='utf-8' ) as f:
     json.dump( fake_data, f, ensure_ascii=False, indent=4 )
 
 if not STORE_TO_DB:

@@ -22,10 +22,21 @@ BUILDER_NAME="multiarch-builder"
 PLATFORMS=""
 REGISTRY=""
 DOCKER_COMPOSE_COMMAND="sudo docker compose up -d"
+SUDO=""
 
 # ===================== load saved config =====================
 if [[ -f "$CONFIG_FILE" ]]; then
   source "$CONFIG_FILE"
+fi
+
+# Prompt to choose sudo if not set by config or CLI
+if [[ -z "$SUDO" ]]; then
+  read -rp "🔐 Do you want to use sudo for Docker commands? [Y/n]: " SUDO_CONFIRM
+  if [[ -z "$SUDO_CONFIRM" || "$SUDO_CONFIRM" =~ ^[Yy]$ ]]; then
+    SUDO="sudo"
+  else
+    SUDO=""
+  fi
 fi
 
 # ===================== flag defaults =====================
@@ -37,6 +48,7 @@ LOAD_INSTEAD_OF_PUSH=false
 DRY_RUN=false
 AUTO_TAG=""
 NO_CONFIRM=false
+NO_CACHE=false
 
 # ===================== validate_image_name =====================
 validate_image_name() {
@@ -65,7 +77,7 @@ for tool in docker; do
   fi
 done
 
-if ! sudo docker buildx version &>/dev/null; then
+if ! $SUDO docker buildx version &>/dev/null; then
   echo "❌ Docker buildx is not installed or not enabled."
   exit 1
 fi
@@ -80,6 +92,8 @@ for arg in "$@"; do
     --load|-l) LOAD_INSTEAD_OF_PUSH=true ;;
     --dry-run|-d) DRY_RUN=true ;;
     --no-confirm|-y) NO_CONFIRM=true ;;
+    --no-cache|-C) NO_CACHE=true ;;
+    --no-sudo|-S) SUDO="" ;;
     --tag=auto|-t)
       if git rev-parse --short HEAD &>/dev/null; then
         AUTO_TAG="$(git rev-parse --short HEAD)"
@@ -100,6 +114,8 @@ for arg in "$@"; do
       echo "  -d, --dry-run                Print all commands but don't execute them"
       echo "  -y, --no-confirm             Skip interactive prompts"
       echo "  -t, --tag=auto               Auto-tag using git SHA or timestamp"
+      echo "  -C, --no-cache               Disable Docker build cache"
+      echo "  -S, --no-sudo                Run Docker commands without sudo"
       echo "  -c, --config-file FILE       Use custom config file"
       echo "      --image-name=NAME        Manually set image name"
       echo "      --builder-name=NAME      Manually set buildx builder name"
@@ -140,7 +156,7 @@ while true; do
   if [[ -z "$PLATFORMS" ]]; then
     read -rp "🖥️ Enter target platforms (comma-separated, e.g., linux/amd64,linux/arm64). Leave blank for current arch: " PLATFORMS
     if [[ -z "$PLATFORMS" ]]; then
-      if CURRENT_PLATFORM=$(sudo docker info --format '{{.OSType}}/{{.Architecture}}' 2>/dev/null); then
+      if CURRENT_PLATFORM=$($SUDO docker info --format '{{.OSType}}/{{.Architecture}}' 2>/dev/null); then
         PLATFORMS="$CURRENT_PLATFORM"
       else
         PLATFORMS="linux/amd64"
@@ -185,34 +201,38 @@ IMAGE_NAME="$IMAGE_NAME"
 BUILDER_NAME="$BUILDER_NAME"
 PLATFORMS="$PLATFORMS"
 DOCKER_COMPOSE_COMMAND="$DOCKER_COMPOSE_COMMAND"
+SUDO="$SUDO"
 EOF
 echo "💾 Configuration saved to '$CONFIG_FILE'"
 
 # ===================== builder setup =====================
 CREATED_BUILDER=false
 echo ""
-if ! sudo docker buildx inspect "$BUILDER_NAME" &>/dev/null; then
+if ! $SUDO docker buildx inspect "$BUILDER_NAME" &>/dev/null; then
   echo "🔧 Setting up buildx for multi-arch support..."
-  sudo docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-  sudo docker buildx create --use --name "$BUILDER_NAME"
+  $SUDO docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  $SUDO docker buildx create --use --name "$BUILDER_NAME"
   CREATED_BUILDER=true
 else
   echo "✅ buildx builder already exists. Using '$BUILDER_NAME'."
-  sudo docker buildx use "$BUILDER_NAME"
+  $SUDO docker buildx use "$BUILDER_NAME"
 fi
 
 # ===================== bootstrap builder =====================
-sudo docker buildx inspect --bootstrap
+$SUDO docker buildx inspect --bootstrap
 
 # ===================== build and push =====================
 echo ""
 echo "🚀 Building image '$IMAGE_NAME'..."
 
-BUILD_CMD="sudo docker buildx build --platform \"$PLATFORMS\" -t \"$IMAGE_NAME\" ."
+BUILD_CMD="$SUDO docker buildx build --platform \"$PLATFORMS\" -t \"$IMAGE_NAME\" ."
 if $LOAD_INSTEAD_OF_PUSH; then
   BUILD_CMD+=" --load"
 else
   BUILD_CMD+=" --push"
+fi
+if $NO_CACHE; then
+  BUILD_CMD+=" --no-cache"
 fi
 
 if $DRY_RUN; then
@@ -225,7 +245,7 @@ fi
 echo ""
 if $ALWAYS_REMOVE_BUILDER; then
   echo "🧹 Removing builder '$BUILDER_NAME'..."
-  sudo docker buildx rm "$BUILDER_NAME"
+  $SUDO docker buildx rm "$BUILDER_NAME"
 else
   echo "ℹ️ Builder '$BUILDER_NAME' was kept."
 fi

@@ -4,7 +4,8 @@ CREATE TABLE patients (
     id TEXT NOT NULL PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    dob TEXT NOT NULL
+    dob DATE NOT NULL,
+    sex TEXT NOT NULL
 
 );
 

@@ -39,6 +39,7 @@ class PatientsModel( _Base ):
     first_name: Mapped[ str ] = mapped_column( nullable=False )
     last_name: Mapped[ str ] = mapped_column( nullable=False )
     dob: Mapped[ str ] = mapped_column( nullable=False )
+    sex: Mapped[ str ] = mapped_column( nullable=False )
 
 class ImageSetsModel( _Base ):
     """Represents a set of images associated with a patient.

@@ -24,14 +24,21 @@
                     "type": "string",
                     "format": "date",
                     "$provider": "faker.date"
+                },
+                "sex": {
+                "title": "sex",
+                "type": "string",
+                "enum": ["Male", "Female"]
                 }
+
             },
             "type": "object",
             "required": [
                 "id",
                 "first_name",
                 "last_name",
-                "dob"
+                "dob",
+                "sex"
             ],
             "additionalProperties": false
         },
