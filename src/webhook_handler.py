@@ -70,7 +70,7 @@ class AnalyzerInterface:
             timeout ( int, optional ): Request timeout in seconds. Defaults to 10.
             debug ( bool, optional ): Enables debug logging. Defaults to False.
         """
-        self.__url = url
+        self.__url = f'{ url }/analyze'
         self.__timeout = timeout
         self.__debug = debug
 
@@ -90,8 +90,23 @@ class AnalyzerInterface:
         try:
             resp = req.post( url=self.__url, headers=headers or default_header, json=payload, timeout=self.__timeout )
 
-        except req.exceptions.RequestException as e:
-            if self.__debug: print( f'Error occurred while analyzing image:\n\n{ e }\n\n' )
-            return None
+            if self.__debug:
+                print( f'Status Code: { resp.status_code }' )
+                print( f'Content-Type: { resp.headers.get("Content-Type", "N/A") }' )
+                print( f'Raw Response: { resp.text[:200] }' )
 
-        return resp.json()
+            if 'application/json' in resp.headers.get( 'Content-Type', '' ):
+                return dict( resp.json() )
+
+            if self.__debug:
+                print( 'Non-JSON or empty response received' )
+
+        except req.exceptions.RequestException as e:
+            if self.__debug:
+                print( f'[analyze_image] Request error:\n\n{ e }\n\n' )
+
+        except ValueError as e:
+            if self.__debug:
+                print( f'[analyze_image] Failed to parse JSON:\n\n{ e }\n\n' )
+
+        return None

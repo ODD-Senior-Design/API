@@ -4,7 +4,7 @@ from typing import Any, Dict
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, abort
 from flask_cors import CORS
-from marshmallow import ValidationError
+from marshmallow import INCLUDE, ValidationError
 from uuid import UUID
 from secrets import token_hex
 
@@ -233,14 +233,19 @@ def assess_image() -> Response:
         Response: A JSON response containing the assessment data.
     """
     ids: dict[ str, Any ] = request.get_json()
-    schema = AssessmentsSchema()
+    schema = AssessmentsSchema( unknown=INCLUDE )
 
     try:
         ids = schema.load( ids )
     except ValidationError as e:
         abort( 400, e.messages )
 
-    assessment_data = ai.analyze_image( ids )
+    base64_image = ids.pop( 'base64_image', None )
+
+    if not base64_image:
+        abort( 404, 'No base64_image found. Uri is not supported at this time.' )
+
+    assessment_data = ai.analyze_image( { 'base64_image': base64_image } )
 
     if assessment_data is None:
         abort( 500, 'Failed to analyze image' )

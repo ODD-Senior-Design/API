@@ -144,9 +144,10 @@ class DBhandler:
             uid = UUID( hex=secrets.token_hex( 16 ) )
 
             new_entry.id = str( uid )
-
-        with contextlib.suppress(AttributeError):
+            
+        if hasattr( new_entry, 'image_timestamp' ):
             new_entry.image_timestamp = datetime.strptime( new_entry.image_timestamp, self.__datetime_format )
+        if hasattr( new_entry, 'assessment_timestamp' ):
             new_entry.assessment_timestamp = datetime.strptime( new_entry.assessment_timestamp, self.__datetime_format )
 
         try:
